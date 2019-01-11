@@ -11,7 +11,6 @@
 
 #include "utlmemory.h"
 #include "utliterator.h"
-#include "vstdlib/strtools.h"
 
 
 //-----------------------------------------------------------------------------
@@ -1654,7 +1653,7 @@ int CUtlRBTreeBase<I, E>::_Depth( I node, size_t unNodeSize, void *pMemBase ) co
 	
 	int depthright = _Depth( _RightChild(node, unNodeSize, pMemBase), unNodeSize, pMemBase );
 	int depthleft = _Depth( _LeftChild(node, unNodeSize, pMemBase), unNodeSize, pMemBase );
-	return ( MAX(depthright, depthleft) + 1 );
+	return ( Max(depthright, depthleft) + 1 );
 }
 
 

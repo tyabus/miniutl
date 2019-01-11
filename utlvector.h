@@ -1360,7 +1360,7 @@ public:
 		char *pNewStr = new char[len];
 		V_strncpy( pNewStr, pString, len );
 		int idx = AddToTail( pNewStr );
-		REFERENCE( idx );
+		(void)(idx);
 	}
 
 	static int __cdecl SortFunc( char * const * sz1, char * const * sz2 )

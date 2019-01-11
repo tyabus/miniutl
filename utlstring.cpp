@@ -163,7 +163,7 @@ size_t CUtlString::FormatV( const char *pFormat, va_list args )
 		len = vsnprintf( m_pchString, len + 1, pFormat, args );
 	}
 
-#elif defined( POSIX )
+#else
 
 	char *buf = NULL;
 	len = vasprintf( &buf, pFormat, args );
@@ -178,9 +178,6 @@ size_t CUtlString::FormatV( const char *pFormat, va_list args )
         Set( buf );
         real_free( buf );
 	}
-
-#else
-#error "define vsnprintf type."
 #endif
 	return len;
 }
@@ -218,12 +215,8 @@ size_t CUtlString::VAppendFormat( const char *pFormat, va_list args )
 		len = vsnprintf( pstrFormatted, len + 1, pFormat, args );
 	}
 
-#elif defined( POSIX )
-
-	len = vasprintf( &pstrFormatted, pFormat, args );
-
 #else
-#error "define vsnprintf type."
+	len = vasprintf( &pstrFormatted, pFormat, args );
 #endif
 
 	// if we ended with a formatted string, append and free it
@@ -233,7 +226,7 @@ size_t CUtlString::VAppendFormat( const char *pFormat, va_list args )
 #if defined( POSIX )
 		real_free( pstrFormatted );
 #else
-        FreePv( pstrFormatted );
+		FreePv( pstrFormatted );
 #endif
 	}
 
@@ -611,7 +604,7 @@ char *CUtlStringBuilder::InternalPrepareBuffer( size_t nChars, bool bCopyOld, si
 		if ( nMinCapacity > nChars )
 			nNewSize = nMinCapacity;
 		else
-			nNewSize = nChars + Min<size_t>( (nChars >> 1) + k_nInitialMinRamp, k_nMillion );
+			nNewSize = nChars + Min<size_t>( (nChars >> 1) + k_nInitialMinRamp, 1000 * 1000 );
 
 		char *pszOld = m_data.Access();
 		size_t nLenOld = m_data.Length();

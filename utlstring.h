@@ -10,6 +10,7 @@
 #pragma once
 #endif
 
+#include "miniutl.h"
 #include "generichash.h"
 
 class CUtlString;

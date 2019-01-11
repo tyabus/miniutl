@@ -20,13 +20,11 @@
 #pragma once
 #endif
 
-#if !defined(OSX) && !defined(_MINIMUM_BUILD_)
-//
-//	Note that CEG builds with _MINIMUM_BUILD_ defined because it must remain CRT agnostic - 
-//	hence we eliminate this CRT reference.
-//
+#if !defined(MY_COMPILER_SUCKS)
 #include <type_traits>
 #endif
+
+#include "miniutl.h"
 
 uint32 MurmurHash3_32( const void *key, size_t len, uint32 seed, bool bCaselessStringVariant = false );
 void MurmurHash3_128( const void * key, const int len, const uint32 seed, void * out );
@@ -117,7 +115,7 @@ inline uint32 HashItemAsBytes( const T&item )
 template <typename T>
 inline uint32 HashItem( const T &item )
 {
-#if !defined(_WIN32) || !defined(_MINIMUM_BUILD_)
+#if !defined(MY_COMPILER_SUCKS)
 	// If you hit this assert, you have likely used a class such as CUtlHashMap with a non-trivial "Key" type
 	// that we don't know how to hash by default.
 	//
@@ -184,14 +182,5 @@ struct HashFunctorUnpaddedStructure
 #endif	// _MINIMUM_BUILD_
 
 //-----------------------------------------------------------------------------
-
-#if	!defined(_MINIMUM_BUILD_)
-namespace PearsonHash
-{
-	unsigned FASTCALL HashString( const char *pszKey );
-	unsigned FASTCALL HashStringCaseless( const char *pszKey );
-}
-#endif
-
 
 #endif /* !GENERICHASH_H */

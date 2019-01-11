@@ -17,6 +17,7 @@
 #include "utlmemory.h"
 #include <stdarg.h>
 #include "utlstring.h"
+#include "minbase_endian.h"
 
 //-----------------------------------------------------------------------------
 // Description of character conversions for string output

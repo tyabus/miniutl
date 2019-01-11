@@ -11,6 +11,8 @@
 
 #include <stdarg.h>
 #include <stdio.h>
+#include <math.h>
+#include "strtools.h"
 
 #if defined( _WIN32 )
 #pragma once
@@ -107,8 +109,8 @@ public:
 	inline const char* SetUint64( uint64 un64 )		{ NUMSTR_CHECK_FAST( un64, uint64 )	m_nLength = V_snprintf( m_szBuf, sizeof(m_szBuf), "%llu", un64 ); return m_szBuf; }
 #endif
 
-	inline const char* SetDouble( double f )		{ if ( f == 0.0  && !std::signbit( f ) ) NUMSTR_FAST_DIGIT( 0 ); if ( f == 1.0  ) NUMSTR_FAST_DIGIT( 1 ); m_nLength = V_snprintf( m_szBuf, sizeof(m_szBuf), "%.18g", f ); return m_szBuf; }
-	inline const char* SetFloat( float f )			{ if ( f == 0.0f && !std::signbit( f ) ) NUMSTR_FAST_DIGIT( 0 ); if ( f == 1.0f ) NUMSTR_FAST_DIGIT( 1 ); m_nLength = V_snprintf( m_szBuf, sizeof(m_szBuf), "%.18g", f ); return m_szBuf; }
+	inline const char* SetDouble( double f )		{ if ( f == 0.0  && !signbit( f ) ) NUMSTR_FAST_DIGIT( 0 ); if ( f == 1.0  ) NUMSTR_FAST_DIGIT( 1 ); m_nLength = V_snprintf( m_szBuf, sizeof(m_szBuf), "%.18g", f ); return m_szBuf; }
+	inline const char* SetFloat( float f )			{ if ( f == 0.0f && !signbit( f ) ) NUMSTR_FAST_DIGIT( 0 ); if ( f == 1.0f ) NUMSTR_FAST_DIGIT( 1 ); m_nLength = V_snprintf( m_szBuf, sizeof(m_szBuf), "%.18g", f ); return m_szBuf; }
 
 	//SDR_PUBLIC inline const char* SetHexUint64( uint64 un64 )	{ V_binarytohex( (byte *)&un64, sizeof( un64 ), m_szBuf, sizeof( m_szBuf ) ); m_nLength = V_strlen(m_szBuf); return m_szBuf; }
 
