@@ -1,4 +1,4 @@
-//========= Copyright � 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright (c) 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose:
 //
@@ -18,16 +18,11 @@
 
 #include <string.h>
 
-#include "tier0/memdbgoff.h"
 #include <algorithm>
 #include <functional>
 #include <type_traits>
-#include "tier0/memdbgon.h"
 
-#include "tier0/platform.h"
-#include "tier0/dbg.h"
-#include "tier1/utlmemory.h"
-#include "vstdlib/strtools.h"
+#include "utlmemory.h"
 
 #define FOR_EACH_VEC( vecName, iteratorName ) \
 	for ( int iteratorName = 0; iteratorName < (vecName).Count(); iteratorName++ )

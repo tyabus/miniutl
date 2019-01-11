@@ -14,9 +14,9 @@
 #pragma once
 #endif
 
-#include "tier1/utlmemory.h"
+#include "utlmemory.h"
 #include <stdarg.h>
-#include "tier1/utlstring.h"
+#include "utlstring.h"
 
 //-----------------------------------------------------------------------------
 // Description of character conversions for string output

@@ -15,12 +15,8 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <limits.h>
-#include "vstdlib/strtools.h"
-#include "tier1/utlbuffer.h"
-#include "tier1/fmtstr.h"
-			
-// memdbgon must be the last include file in a .cpp file!!!
-#include "tier0/memdbgon.h"
+#include "utlbuffer.h"
+#include "fmtstr.h"
 			    
 
 //-----------------------------------------------------------------------------

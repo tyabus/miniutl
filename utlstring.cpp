@@ -10,12 +10,8 @@
 #pragma warning (disable:4514)
 #endif
 
-#include "tier1/utlstring.h"
-#include "tier0/t0constants.h"
-#include "tier1/utlvector.h"
-
-#include "tier0/memdbgon.h"
-
+#include "utlstring.h"
+#include "utlvector.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: Helper: Find s substring

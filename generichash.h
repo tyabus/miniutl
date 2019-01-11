@@ -1,4 +1,4 @@
-//======= Copyright � 2005-2011, Valve Corporation, All rights reserved. =========
+//======= Copyright (c) 2005-2011, Valve Corporation, All rights reserved. =========
 //
 // Public domain MurmurHash3 by Austin Appleby is a very solid general-purpose
 // hash with a 32-bit output. References:

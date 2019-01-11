@@ -10,14 +10,7 @@
 #pragma once
 #endif
 
-#include "tier0/dbg.h"
-#include "tier0/validator.h"
-#include "tier0/platform.h"
-#include "vstdlib/strtools.h"
-#include "tier1/generichash.h"
-
-
-#include "tier0/memdbgon.h"
+#include "generichash.h"
 
 class CUtlString;
 class CUtlStringBuilder;

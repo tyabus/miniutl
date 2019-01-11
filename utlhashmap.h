@@ -12,10 +12,9 @@
 #pragma once
 #endif
 
-#include "tier0/dbg.h"
-#include "tier1/bitstring.h"
-#include "tier1/utliterator.h"
-#include "tier1/utlvector.h"
+#include "bitstring.h"
+#include "utliterator.h"
+#include "utlvector.h"
 
 #define FOR_EACH_HASHMAP( mapName, iteratorName ) \
 	for ( int iteratorName = 0; iteratorName < (mapName).MaxElement(); ++iteratorName ) if ( !(mapName).IsValidIndex( iteratorName ) ) continue; else

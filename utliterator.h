@@ -7,8 +7,6 @@
 #ifndef UTLITERATOR_H
 #define UTLITERATOR_H
 
-#include "tier0/dbg.h"
-
 //-----------------------------------------------------------------------------
 // Forward declarations of tag types and some template helper classes
 //-----------------------------------------------------------------------------

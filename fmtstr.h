@@ -1,4 +1,4 @@
-//========= Copyright � 1996-2005, Valve Corporation, All rights reserved. ============//
+//========= Copyright (c) 1996-2005, Valve Corporation, All rights reserved. ============//
 //
 // Purpose: A simple class for performing safe and in-expression sprintf-style
 //			string formatting
@@ -11,9 +11,6 @@
 
 #include <stdarg.h>
 #include <stdio.h>
-#include "tier0/platform.h"
-#include "tier0/dbg.h"
-#include "vstdlib/strtools.h"
 
 #if defined( _WIN32 )
 #pragma once

@@ -14,10 +14,7 @@
 #pragma once
 #endif
 
-#include "tier0/dbg.h"
 #include <string.h>
-#include "tier0/platform.h"
-#include "tier0/memdbgon.h"
 
 #pragma warning(push)
 #pragma warning (disable:4100) // 'identifier' : unreferenced formal parameter
