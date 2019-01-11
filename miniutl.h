@@ -97,7 +97,7 @@ inline void AssertMsg( int pred, const char *fmt, ... )
 	char buf[1024];
 	va_list va;
 	va_start( va, fmt );
-	V_vsnprintf( buf, sizeof( buf ), fmt, va );
+	vsnprintf( buf, sizeof( buf ), fmt, va );
 	va_end( va );
 
 	assert( pred && fmt );
