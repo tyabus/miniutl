@@ -38,7 +38,7 @@ m_nAllocationCount( numElements ),  m_unSizeOfElements( nSizeOfType )
 	m_nGrowSize = EXTERNAL_CONST_BUFFER_MARKER;
 }
 
-#ifdef VALVE_RVALUE_REFS
+#ifndef MY_COMPILER_SUCKS
 CUtlMemoryBase::CUtlMemoryBase( CUtlMemoryBase&& src )
 {
 	// Default init this so when we destruct src it doesn't do anything.
@@ -49,7 +49,7 @@ CUtlMemoryBase::CUtlMemoryBase( CUtlMemoryBase&& src )
 
 	Swap( src );
 }
-#endif // VALVE_RVALUE_REFS
+#endif // MY_COMPILER_SUCKS
 
 
 CUtlMemoryBase::~CUtlMemoryBase()

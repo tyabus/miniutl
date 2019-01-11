@@ -18,9 +18,11 @@
 
 #include <string.h>
 
+#ifndef MY_COMPILER_SUCKS
 #include <algorithm>
 #include <functional>
 #include <type_traits>
+#endif
 
 #include "utlmemory.h"
 
@@ -48,13 +50,11 @@ public:
 
 	// constructor, destructor
 	explicit CUtlVector( int growSize = 0, int initSize = 0 );
-#ifdef VALVE_RVALUE_REFS
+#ifndef MY_COMPILER_SUCKS
 	CUtlVector( CUtlVector&& src );
-#endif // VALVE_RVALUE_REFS
-	CUtlVector( T* pMemory, int allocationCount, int numElements = 0 );
-#ifdef VALVE_INITIALIZER_LIST_SUPPORT
 	CUtlVector( std::initializer_list<T> initializerList );
-#endif // VALVE_INITIALIZER_LIST_SUPPORT
+#endif // MY_COMPILER_SUCKS
+	CUtlVector( T* pMemory, int allocationCount, int numElements = 0 );
 	~CUtlVector();
 
 	// Copy the array.
@@ -102,7 +102,7 @@ public:
 	int AddToTail( const T& src );
 	int InsertBefore( int elem, const T& src );
 	int InsertAfter( int elem, const T& src );
-#ifdef VALVE_RVALUE_REFS
+#ifndef MY_COMPILER_SUCKS
 	int AddToTail( T&& src );
 #endif
 
@@ -127,10 +127,10 @@ public:
 	// Finds an element (element needs operator== defined)
 	int Find( const T& src ) const;
 
-#ifdef VALVE_RVALUE_REFS
+#ifndef MY_COMPILER_SUCKS
 	template < typename TMatchFunc >
 	int FindMatch( TMatchFunc&& func ) const;
-#endif // VALVE_RVALUE_REFS
+#endif // MY_COMPILER_SUCKS
 
 	bool HasElement( const T& src ) const;
 
@@ -281,14 +281,14 @@ inline CUtlVector<T, A>::CUtlVector( int growSize, int initSize )	:
 {
 }
 
-#ifdef VALVE_RVALUE_REFS
+#ifndef MY_COMPILER_SUCKS
 template< typename T, class A >
 inline CUtlVector<T, A>::CUtlVector( CUtlVector<T, A>&& src )
 	: m_Size( 0 )
 {
 	Swap( src );
 }
-#endif // VALVE_RVALUE_REFS
+#endif // MY_COMPILER_SUCKS
 
 template< typename T, class A >
 inline CUtlVector<T, A>::CUtlVector( T* pMemory, int allocationCount, int numElements )	:
@@ -296,7 +296,7 @@ inline CUtlVector<T, A>::CUtlVector( T* pMemory, int allocationCount, int numEle
 {
 }
 
-#ifdef VALVE_INITIALIZER_LIST_SUPPORT
+#ifndef MY_COMPILER_SUCKS
 template< typename T, class A >
 inline CUtlVector<T, A>::CUtlVector( std::initializer_list<T> initializerList ) :
 	m_Size(0)
@@ -1045,7 +1045,7 @@ inline int CUtlVector<T, A>::InsertBefore( int elem, const T& src )
 	return elem;
 }
 
-#ifdef VALVE_RVALUE_REFS
+#ifndef MY_COMPILER_SUCKS
 // Optimized AddToTail path with move constructor.
 template< typename T, class A >
 inline int CUtlVector<T, A>::AddToTail( T&& src )
@@ -1180,7 +1180,7 @@ inline int CUtlVector<T, A>::Find( const T& src ) const
 	return InvalidIndex();
 }
 
-#ifdef VALVE_RVALUE_REFS
+#ifndef MY_COMPILER_SUCKS
 template< typename T, class A >
 template < typename TMatchFunc >
 inline int CUtlVector<T, A>::FindMatch( TMatchFunc&& func ) const
@@ -1192,7 +1192,7 @@ inline int CUtlVector<T, A>::FindMatch( TMatchFunc&& func ) const
 	}
 	return InvalidIndex();
 }
-#endif // VALVE_RVALUE_REFS
+#endif // MY_COMPILER_SUCKS
 
 template< typename T, class A >
 inline bool CUtlVector<T, A>::HasElement( const T& src ) const

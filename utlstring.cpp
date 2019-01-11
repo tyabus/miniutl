@@ -107,7 +107,7 @@ static size_t RemoveWhitespace( char *pszString )
 }
 
 
-#ifdef VALVE_RVALUE_REFS
+#ifndef MY_COMPILER_SUCKS
 //-----------------------------------------------------------------------------
 // Purpose: move-constructor from CUtlStringBuilder to CUtlString
 //-----------------------------------------------------------------------------

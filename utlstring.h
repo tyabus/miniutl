@@ -154,7 +154,7 @@ public:
 	bool TruncateUTF8Bytes( size_t unMaxBytes ) { return TruncateUTF8Internal( (size_t)-1, unMaxBytes ); }
 	bool TruncateUTF8Chars( size_t unMaxChars ) { return TruncateUTF8Internal( unMaxChars, (size_t)-1 ); }
 
-#ifdef VALVE_RVALUE_REFS
+#ifndef MY_COMPILER_SUCKS
 	// Move construction, rvalue assignment from like type
 	CUtlString( CUtlString &&string ) : m_pchString( string.m_pchString ) { string.m_pchString = NULL; }
 	CUtlString &operator=( CUtlString &&string ) { Swap( string ); return *this; }
@@ -711,7 +711,7 @@ public:
 
 	~CUtlStringBuilder();
 
-#ifdef VALVE_RVALUE_REFS
+#ifndef MY_COMPILER_SUCKS
 	// Create a new CUtlString by concatenating any number of arguments. This will call the
 	// appropriate += operator if one exists.
 	template < typename ...Types >
@@ -721,7 +721,7 @@ public:
 		ConcatHelper( sBuilder, std::forward<Types>( args )... );
 		return sBuilder.DetachString();
 	}
-#endif // VALVE_RVALUE_REFS
+#endif // MY_COMPILER_SUCKS
 
 	// operator=
 	CUtlStringBuilder &operator=( const CUtlStringBuilder &src );
@@ -871,7 +871,7 @@ public:
 	// SetError() With no assertion check - should only be used for tests
 	void SetErrorNoAssert() { m_data.SetError(false); }
 
-#ifdef VALVE_RVALUE_REFS
+#ifndef MY_COMPILER_SUCKS
 	// Move construction, rvalue assignment from same type
 	CUtlStringBuilder( CUtlStringBuilder &&string ) { m_data.Raw = string.m_data.Raw; string.m_data.Construct(); }
 	CUtlStringBuilder &operator=( CUtlStringBuilder &&string ) { Swap( string ); return *this; }
@@ -884,7 +884,7 @@ public:
 #endif
 
 private:
-#ifdef VALVE_RVALUE_REFS
+#ifndef MY_COMPILER_SUCKS
 	// Append one element to our string builder at a time. Supports any argument type that CUtlStringBuilder +=
 	// supports.
 	template < typename FirstType, typename ...Types >
@@ -896,7 +896,7 @@ private:
 
 	// Empty recursive end for when we run out of varargs.
 	static void ConcatHelper( CUtlStringBuilder& sBuilder ) { }
-#endif // VALVE_RVALUE_REFS
+#endif // MY_COMPILER_SUCKS
 
 	size_t ReplaceInternal( const char *pstrTarget, const char *pstrReplacement, const char *pfnCompare(const char*, const char*)  );
 	operator bool () const	{ return IsValid(); }
