@@ -285,8 +285,6 @@ inline const T *CUtlMemory<T>::Base() const
 	return (const T*)m_pMemory;
 }
 
-#include "tier0/memdbgoff.h"
-
 #pragma warning(pop)
 
 #endif // UTLMEMORY_H
