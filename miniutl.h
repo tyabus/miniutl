@@ -8,7 +8,6 @@
 
 #include <assert.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <stddef.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -142,6 +141,24 @@ static FORCEINLINE T const & Max( T const &val1, T const &val2 )
 
 #define V_ARRAYSIZE( arr ) ( sizeof((arr)) / sizeof((arr)[0]) )
 
+#ifdef _MSC_VER == 1200
+// msvc6 only targets win32
+typedef char int8;
+typedef unsigned char uint8;
+
+typedef short int16;
+typedef unsigned short uint16;
+
+typedef int int32;
+typedef unsigned int uint32;
+
+typedef __int64 int64;
+typedef unsigned __int64 uint64;
+
+typedef int uintp;
+typedef unsigned int intp;
+#else
+#include <stdint.h>
 typedef int8_t int8;
 typedef uint8_t uint8;
 
@@ -156,6 +173,7 @@ typedef uint64_t uint64;
 
 typedef size_t uintp;
 typedef ssize_t intp;
+#endif
 
 //-----------------------------------------------------------------------------
 // There is no requirement that a va_list be usable in multiple calls,
