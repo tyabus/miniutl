@@ -1714,12 +1714,36 @@ void CUtlBuffer::PutUnsignedInt( unsigned int u )
 
 void CUtlBuffer::PutFloat( float f )
 {
+#if _MSC_VER == 1200 //!!!
+	if (!IsText())
+	{
+		uint32 _f = *(uint32*)&f;
+		PUT_BIN_DATA( uint32, _f );
+	}
+	else
+	{
+		PutString( CNumStr( f ) );
+	}
+#else
 	PUT_TYPE( float, f );
+#endif
 }
 
 void CUtlBuffer::PutDouble( double d )
 {
+#if _MSC_VER == 1200 //!!!
+	if (!IsText())
+	{
+		int64 _f = *(int64*)&d;
+		PUT_BIN_DATA( int64, _f );
+	}
+	else
+	{
+		PutString( CNumStr( d ) );
+	}
+#else
 	PUT_TYPE( double, d );
+#endif
 }
 
 char CUtlBuffer::GetChar()
@@ -1802,13 +1826,75 @@ unsigned int CUtlBuffer::GetUnsignedInt()
 float CUtlBuffer::GetFloat()
 {
 	float f;
+#if _MSC_VER == 1200
+	if ( !IsText() )
+	{
+		if (CheckGet( sizeof(f) ))
+		{
+			if ( (m_Flags & CUtlBuffer::LITTLE_ENDIAN_BUFFER ) )
+			{
+				f = LittleDWord( (uint32)*(float *)PeekGet() );
+			}									\
+			else if ( (m_Flags & CUtlBuffer::BIG_ENDIAN_BUFFER ) )
+			{
+				f = BigDWord( (uint32)*(float *)PeekGet() );
+			}
+			else
+			{
+				COPY_TYPE( float, f );
+			}
+			m_Get += sizeof(float);
+		}
+		else
+		{
+			f = 0;
+		}
+	}
+	else
+	{
+		f = 0;
+		Scanf( "%f", &f );
+	}
+#else
 	GET_TYPE( float, f, "%f" );
+#endif
 	return f;
 }
 
 double CUtlBuffer::GetDouble()
 {
 	double d;
+#if _MSC_VER == 1200
+	if ( !IsText() )
+	{
+		if (CheckGet( sizeof(d) ))
+		{
+			if ( (m_Flags & CUtlBuffer::LITTLE_ENDIAN_BUFFER ) )
+			{
+				d = (int64)LittleQWord( (uint64)*(double *)PeekGet() );
+			}									\
+			else if ( (m_Flags & CUtlBuffer::BIG_ENDIAN_BUFFER ) )
+			{
+				d = (int64)BigQWord( (uint64)*(double *)PeekGet() );
+			}
+			else
+			{
+				COPY_TYPE( double, d );
+			}
+			m_Get += sizeof(double);
+		}
+		else
+		{
+			d = 0;
+		}
+	}
+	else
+	{
+		d = 0;
+		Scanf( "%f", &d );
+	}
+#else
 	GET_TYPE( double, d, "%f" );
+#endif
 	return d;
 }
