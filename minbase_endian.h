@@ -23,7 +23,7 @@ inline T WordSwapC( T w )
 {
 	COMPILE_TIME_ASSERT( sizeof(T) == sizeof(uint16) );
 	uint16 temp;
-#if defined( _MSC_VER ) || defined( __ICC )
+#if defined( __ICC )
 	temp = _byteswap_ushort( *(uint16*)&w );
 #else
 	// This translates into a single rotate on x86/x64
@@ -38,15 +38,15 @@ inline T DWordSwapC( T dw )
 {
 	COMPILE_TIME_ASSERT( sizeof( T ) == sizeof(uint32) );
 	uint32 temp;
-#if defined( _MSC_VER ) || defined( __ICC )
+#if defined( __ICC )
 	temp = _byteswap_ulong( *(uint32*)&dw );
 #elif defined( __clang__ ) || defined( __GNUC__ )
 	temp = __builtin_bswap32( *(uint32*)&dw );
 #else
-	temp = *((uint32 *)&dw) 				>> 24;
+	temp =    *((uint32 *)&dw) >> 24;
 	temp |= ((*((uint32 *)&dw) & 0x00FF0000) >> 8);
 	temp |= ((*((uint32 *)&dw) & 0x0000FF00) << 8);
-	temp |= (*((uint32 *)&dw) << 24;
+	temp |=   *((uint32 *)&dw) << 24;
 #endif
    return *((T*)&temp);
 }
@@ -56,7 +56,7 @@ inline T QWordSwapC( T dw )
 {
 	COMPILE_TIME_ASSERT( sizeof( dw ) == sizeof(uint64) );
 	uint64 temp;
-#if defined( _MSC_VER ) || defined( __ICC )
+#if defined( __ICC )
 	temp = _byteswap_uint64( *(uint64*)&dw );
 #elif defined( __clang__ ) || defined( __GNUC__ )
 	temp = __builtin_bswap64( *(uint64*)&dw );
@@ -70,6 +70,12 @@ inline T QWordSwapC( T dw )
 #define WordSwap  WordSwapC
 #define DWordSwap DWordSwapC
 #define QWordSwap QWordSwapC
+
+#ifdef _WIN32
+#define __LITTLE_ENDIAN 4321
+#define __BIG_ENDIAN 1234
+#define __BYTE_ORDER __LITTLE_ENDIAN //!!!
+#endif
 
 #if !defined(__BYTE_ORDER) && !defined(__LITTLE_ENDIAN) && !defined(__BIG_ENDIAN)
 #error
