@@ -205,27 +205,12 @@ public:
 		typedef IteratorNode_t ElemType_t;
 		typedef typename CUtlHashMap::IndexType_t IndexType_t;
 
-		typedef CUtlForwardIteratorImplT< IterateKeyElemProxyAlias, false > iterator;
-		typedef CUtlForwardIteratorImplT< IterateKeyElemProxyAlias, true > const_iterator;
-
 		ElemType_t &		Element( IndexType_t i )		{ return *reinterpret_cast<IteratorNode_t*>( &reinterpret_cast<CUtlHashMap*>(this)->m_memNodes.Element( i ) ); }
 		const ElemType_t &	Element( IndexType_t i ) const	{ return *reinterpret_cast<const IteratorNode_t*>( &reinterpret_cast<const CUtlHashMap*>(this)->m_memNodes.Element( i ) ); }
 		IndexType_t IteratorNext( IndexType_t i ) const		{ auto pSelf = reinterpret_cast<const CUtlHashMap*>(this); while ( ++i < pSelf->MaxElement() ) { if ( pSelf->IsValidIndex( i ) ) return i; } return -1; }
-
-		iterator begin()				{ return iterator( this, IteratorNext( -1 ) ); }
-		iterator end()					{ return iterator( this, -1 ); }
-		const_iterator begin() const	{ return const_iterator( this, IteratorNext( -1 ) ); }
-		const_iterator end() const		{ return const_iterator( this, -1 ); }
 	};
 
 	friend struct IterateKeyElemProxyAlias;
-
-	typedef CUtlForwardIteratorImplT< IterateKeyElemProxyAlias, false > iterator;
-	typedef CUtlForwardIteratorImplT< IterateKeyElemProxyAlias, true > const_iterator;
-	iterator begin()				{ return reinterpret_cast<IterateKeyElemProxyAlias*>(this)->begin(); }
-	iterator end()					{ return reinterpret_cast<IterateKeyElemProxyAlias*>(this)->end(); }
-	const_iterator begin() const	{ return reinterpret_cast<const IterateKeyElemProxyAlias*>(this)->begin(); }
-	const_iterator end() const		{ return reinterpret_cast<const IterateKeyElemProxyAlias*>(this)->end(); }
 
 protected:
 	IndexType_t m_cElements;

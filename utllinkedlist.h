@@ -130,13 +130,6 @@ public:
 	I  FirstInorder() const { return First(); }
 	I  NextInorder( I i ) const { return Next( i ); }
 
-	// STL / C++11-style iterators 
-	typedef CUtlBidirectionalIteratorImplT< CUtlLinkedList< T, I >, false > iterator;
-	typedef CUtlBidirectionalIteratorImplT< CUtlLinkedList< T, I >, true > const_iterator;
-	const_iterator begin() const { return const_iterator( this, Head() ); }
-	const_iterator end() const { return const_iterator( this, INVALID_LLIST_IDX ); }
-	iterator begin() { return iterator( this, Head() ); }
-	iterator end() { return iterator( this, INVALID_LLIST_IDX ); }
 	I IteratorNext( I i ) const { return Next( i ); }
 	I IteratorPrev( I i ) const { return i == INVALID_LLIST_IDX ? Tail() : Previous( i ); }
 
