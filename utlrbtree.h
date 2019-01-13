@@ -61,32 +61,30 @@ public:
 
 typedef const char * PConstChar_t;
 
-//SDR_PUBLIC class CDefCaselessStringLess
-//SDR_PUBLIC {
-//SDR_PUBLIC public:
-//SDR_PUBLIC 	CDefCaselessStringLess() {}
-//SDR_PUBLIC 	CDefCaselessStringLess( int i ) {}
-//SDR_PUBLIC 	inline bool operator()( const PConstChar_t &lhs, const PConstChar_t &rhs ) const { return ( V_stricmp(lhs, rhs) < 0 ); }
-//SDR_PUBLIC 	inline bool operator!() const { return false; }
-//SDR_PUBLIC };
-//SDR_PUBLIC 
-//SDR_PUBLIC class CDefStringLess
-//SDR_PUBLIC {
-//SDR_PUBLIC public:
-//SDR_PUBLIC 	CDefStringLess() {}
-//SDR_PUBLIC 	CDefStringLess( int i ) {}
-//SDR_PUBLIC 	inline bool operator()( const PConstChar_t &lhs, const PConstChar_t &rhs ) const { return ( V_strcmp(lhs, rhs) < 0 ); }
-//SDR_PUBLIC 	inline bool operator!() const { return false; }
-//SDR_PUBLIC };
+class CDefCaselessStringLess
+{
+public:
+	CDefCaselessStringLess() {}
+	CDefCaselessStringLess( int i ) {}
+	inline bool operator()( const PConstChar_t &lhs, const PConstChar_t &rhs ) const { return ( V_stricmp(lhs, rhs) < 0 ); }
+	inline bool operator!() const { return false; }
+};
+
+class CDefStringLess
+{
+public:
+	CDefStringLess() {}
+	CDefStringLess( int i ) {}
+	inline bool operator()( const PConstChar_t &lhs, const PConstChar_t &rhs ) const { return ( V_strcmp(lhs, rhs) < 0 ); }
+	inline bool operator!() const { return false; }
+};
 
 #define INVALID_RBTREE_IDX ((I)~0)
 
 //-------------------------------------
 
-//SDR_PUBLIC inline bool WideStringLessThan( const wchar_t * const &lhs, const wchar_t * const &rhs)	{ return ( V_wcscmp(lhs, rhs) < 0 );  }
-
 inline bool StringLessThan( const char * const &lhs, const char * const &rhs)			{ return ( V_strcmp(lhs, rhs) < 0 );  }
-//SDR_PUBLIC inline bool CaselessStringLessThan( const char * const &lhs, const char * const &rhs )	{ return ( V_stricmp(lhs, rhs) < 0 ); }
+inline bool CaselessStringLessThan( const char * const &lhs, const char * const &rhs )	{ return ( V_stricmp(lhs, rhs) < 0 ); }
 
 // Same as CaselessStringLessThan, but it ignores differences in / and \.
 inline bool CaselessStringLessThanIgnoreSlashes( const char * const &lhs, const char * const &rhs )	
@@ -456,13 +454,6 @@ public:
 
 	int CubAllocated() { return m_Elements.CubAllocated(); }
 
-	// STL / C++11-style iterators (in-order traversal)
-	typedef CUtlBidirectionalIteratorImplT< CUtlRBTree< T, I, L, E >, false > iterator;
-	typedef CUtlBidirectionalIteratorImplT< CUtlRBTree< T, I, L, E >, true > const_iterator;
-	iterator begin() { return iterator( this, FirstInorder() ); }
-	iterator end() { return iterator( this, INVALID_RBTREE_IDX ); }
-	const_iterator begin() const { return const_iterator( this, FirstInorder() ); }
-	const_iterator end() const { return const_iterator( this, INVALID_RBTREE_IDX ); }
 	I IteratorNext( I i ) const { return NextInorder( i ); }
 	I IteratorPrev( I i ) const { return i == INVALID_RBTREE_IDX ? LastInorder() : PrevInorder( i ); }
 
@@ -473,13 +464,6 @@ public:
 		T &Element( I i ) { return reinterpret_cast<CUtlRBTree*>(this)->Element( i ); }
 		const T &Element( I i ) const { return reinterpret_cast<const CUtlRBTree*>(this)->Element( i ); }
 		I IteratorNext( I i ) const { auto pTree = reinterpret_cast<const CUtlRBTree*>(this); while ( ++i < pTree->MaxElement() ) { if ( pTree->IsValidIndex( i ) ) return i; } return INVALID_RBTREE_IDX; }
-
-		typedef CUtlForwardIteratorImplT< ProxyTypeIterateUnordered, false > iterator;
-		typedef CUtlForwardIteratorImplT< ProxyTypeIterateUnordered, true > const_iterator;
-		iterator begin() { return iterator( this, IteratorNext( (I)0 - 1 ) ); }
-		iterator end() { return iterator( this, INVALID_RBTREE_IDX ); }
-		const_iterator begin() const { return const_iterator( this, IteratorNext( (I)0 - 1 ) ); }
-		const_iterator end() const { return const_iterator( this, INVALID_RBTREE_IDX ); }
 	};
 	ProxyTypeIterateUnordered &IterateUnordered() { return *reinterpret_cast<ProxyTypeIterateUnordered*>(this); }
 	const ProxyTypeIterateUnordered &IterateUnordered() const { return *reinterpret_cast<const ProxyTypeIterateUnordered*>(this); }
@@ -507,9 +491,9 @@ protected:
 	inline CUtlRBTreeInternal::Links_t<I> const	&Links( I i ) const { return _Links( i, sizeof(Node_t), (void*)m_Elements.Base() ); }
 	inline CUtlRBTreeInternal::Links_t<I>		&Links( I i ){ return this->_Links( i, sizeof(Node_t), (void*)m_Elements.Base() ); }   
 
-	inline void  SetParent( I i, I parent ) { return _SetParent( i, parent, sizeof(Node_t), (void*)m_Elements.Base() ); } 
-	inline void  SetLeftChild( I i, I child  ) { return this->_SetLeftChild( i, child, sizeof(Node_t), (void*)m_Elements.Base() ); } 
-	inline void  SetRightChild( I i, I child  ) { return this->_SetRightChild( i, child, sizeof(Node_t), (void*)m_Elements.Base() ); } 
+	inline void  SetParent( I i, I parent ) { _SetParent( i, parent, sizeof(Node_t), (void*)m_Elements.Base() ); } 
+	inline void  SetLeftChild( I i, I child  ) { this->_SetLeftChild( i, child, sizeof(Node_t), (void*)m_Elements.Base() ); } 
+	inline void  SetRightChild( I i, I child  ) { this->_SetRightChild( i, child, sizeof(Node_t), (void*)m_Elements.Base() ); } 
 	
 	// Checks if a link is red or black
 	inline bool IsRed( I i ) const { return _IsRed( i, sizeof(Node_t), (void*)m_Elements.Base() ); } 
