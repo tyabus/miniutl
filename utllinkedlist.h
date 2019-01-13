@@ -14,8 +14,6 @@
 #endif
 
 #include "utlmemory.h"
-#include "utliterator.h"
-
 
 // This is a useful macro to iterate from head to tail in a CUtlLinkedList.
 // CUtlLinkedListHead/Tail functions are used to ensure that these macros

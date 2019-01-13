@@ -10,7 +10,6 @@
 #define UTLRBTREE_H
 
 #include "utlmemory.h"
-#include "utliterator.h"
 
 
 //-----------------------------------------------------------------------------

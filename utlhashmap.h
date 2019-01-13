@@ -13,7 +13,6 @@
 #endif
 
 #include "bitstring.h"
-#include "utliterator.h"
 #include "utlvector.h"
 
 #define FOR_EACH_HASHMAP( mapName, iteratorName ) \
