@@ -31,6 +31,7 @@
 #define FOR_EACH_VEC_BACK( vecName, iteratorName ) \
 	for ( int iteratorName = (vecName).Count()-1; iteratorName >= 0; iteratorName-- )
 
+
 //-----------------------------------------------------------------------------
 // The CUtlVector class:
 // A growable array class which doubles in size by default.
@@ -49,11 +50,7 @@ public:
 	typedef const T* const_iterator;
 
 	// constructor, destructor
-	explicit CUtlVector( int growSize = 0, int initSize = 0 );
-#ifndef MY_COMPILER_SUCKS
-	CUtlVector( CUtlVector&& src );
-	CUtlVector( std::initializer_list<T> initializerList );
-#endif // MY_COMPILER_SUCKS
+	CUtlVector( int growSize = 0, int initSize = 0 );
 	CUtlVector( T* pMemory, int allocationCount, int numElements = 0 );
 	~CUtlVector();
 
@@ -85,7 +82,6 @@ public:
 	int Count() const;
 	bool IsEmpty() const { return (Count() == 0); }
 
-	int CubAllocated() { return m_Memory.CubAllocated(); }
 	// Is element index valid?
 	bool IsValidIndex( int i ) const;
 	static int InvalidIndex();
@@ -102,9 +98,6 @@ public:
 	int AddToTail( const T& src );
 	int InsertBefore( int elem, const T& src );
 	int InsertAfter( int elem, const T& src );
-#ifndef MY_COMPILER_SUCKS
-	int AddToTail( T&& src );
-#endif
 
 	// Adds multiple elements, uses default constructor
 	int AddMultipleToHead( int num );
@@ -126,11 +119,6 @@ public:
 
 	// Finds an element (element needs operator== defined)
 	int Find( const T& src ) const;
-
-#ifndef MY_COMPILER_SUCKS
-	template < typename TMatchFunc >
-	int FindMatch( TMatchFunc&& func ) const;
-#endif // MY_COMPILER_SUCKS
 
 	bool HasElement( const T& src ) const;
 
@@ -175,32 +163,12 @@ public:
 	int		SortedFindLessOrEqual( const T& search, bool (__cdecl *pfnLessFunc)( const T& src1, const T& src2, void *pCtx ), void *pLessContext ) const;
 	int		SortedFindLessOrEqual( const T& search, bool (__cdecl *pfnLessFunc)( const T& src1, const T& src2 ), int start, int end ) const;
 	int		SortedFindLessOrEqual( const T& search, bool (__cdecl *pfnLessFunc)( const T& src1, const T& src2 ) ) const;
-	// Finds an element within the list using a binary search and a predicate
-	// comparerPredicate has to implement: int Compare( const T &left ) const;
-	template <typename T2>
-	int		SortedFindIf( const T2 &comparerPredicate ) const;
-	template <typename T2>
-	int		SortedFindFirst( const T2 &comparerPredicate ) const;
-	template <typename T2>
-	const T&	FindElementIf( const T2 &comparerPredicate, const T& defaultParam ) const;
-
+	
 	int		SortedInsert( const T& src, bool (__cdecl *pfnLessFunc)( const T& src1, const T& src2, void *pCtx ), void *pLessContext );
 	int		SortedInsert( const T& src, bool (__cdecl *pfnLessFunc)( const T& src1, const T& src2 ) );
 
-	/// sort using std:: with a predicate. e.g. [] -> bool ( T &a, T &b ) { return a < b; }
-	template <class F> void SortPredicate( F &&predicate );
-
-	/// Sort using the default less predicate
-	void Sort() { SortPredicate( std::less<T>{} ); };
-
 	// WARNING: The less func for these Sort functions expects -1, 0 for equal, or 1. If you pass only true/false back, you won't get correct sorting.
 	void Sort( int (__cdecl *pfnCompare)(const T *, const T *) );
-	void Sort_s( void *context, int (__cdecl *pfnCompare)(void *, const T *, const T *) );
-
-	// These sorts expect true/false
-	void Sort( bool( __cdecl *pfnLessFunc )(const T& src1, const T& src2) );
-	void Sort( bool( __cdecl *pfnLessFunc )(const T& src1, const T& src2, void *pCtx), void *pLessContext );
-	void Sort_s( void *context, bool (__cdecl *pfnLessFunc)( const T& src1, const T& src2, void *pCtx ) );
 
 #ifdef DBGFLAG_VALIDATE
 	void Validate( CValidator &validator, const char *pchName );					// Validate our internal structures
@@ -595,14 +563,6 @@ inline int CUtlVector<T, A>::SortedInsert( const T& src, bool (__cdecl *pfnLessF
 	return pos;
 }
 
-template< typename T, class A >
-template <class F>
-inline void CUtlVector<T, A>::SortPredicate( F &&predicate )
-{
-	std::sort( begin(), end(), predicate );
-}
-
-
 //-----------------------------------------------------------------------------
 // sorted find, with no context pointer
 //-----------------------------------------------------------------------------
@@ -653,88 +613,6 @@ inline int CUtlVector<T, A>::SortedFindLessOrEqual( const T& search, bool (__cde
 }
 
 
-//-----------------------------------------------------------------------------
-// finds the FIRST matching element ( assumes dupes )
-// You must sort the list before using or your results will be wrong
-// comparerPredicate has to implement: int Compare( const T &src ) const;
-//-----------------------------------------------------------------------------
-template< typename T, class A >
-template <typename T2>
-inline int CUtlVector<T, A>::SortedFindFirst( const T2 &comparerPredicate ) const
-{
-	int start = 0, stop = Count() - 1;
-	while ( start <= stop )
-	{
-		int mid = ( start + stop ) >> 1;
-		int nResult = comparerPredicate.Compare( Base()[mid] );
-		if ( nResult < 0 )
-		{
-			start = mid + 1;
-		}
-		else if ( nResult > 0 )
-		{
-			stop = mid - 1;
-		}
-		else
-		{
-			// found a match - but we want the first one - keep looking
-			if ( start == mid )
-				return mid;
-			stop = mid;
-		}
-	}
-	return InvalidIndex();
-}
-
-
-//-----------------------------------------------------------------------------
-// sorted find with a comparer predicate
-// comparerPredicate has to implement: int Compare( const T &src ) const;
-//-----------------------------------------------------------------------------
-template< typename T, class A >
-template <typename T2>
-inline int CUtlVector<T, A>::SortedFindIf( const T2 &comparerPredicate ) const
-{
-	int start = 0, stop = Count() - 1;
-	while (start <= stop)
-	{
-		int mid = (start + stop) >> 1;
-		int nResult = comparerPredicate.Compare( Base()[mid] );
-		if ( nResult < 0 )
-		{
-			start = mid + 1;
-		}
-		else if ( nResult > 0 )
-		{
-			stop = mid - 1;
-		}
-		else
-		{
-			return mid;
-		}
-	}
-	return InvalidIndex();
-}
-
-//-----------------------------------------------------------------------------
-// unsorted find with a comparer predicate
-// comparerPredicate has to implement: bool ( const T &src ) const;
-//-----------------------------------------------------------------------------
-template< typename T, class A >
-template <typename T2>
-inline const T&	CUtlVector<T, A>::FindElementIf( const T2 &comparerPredicate, const T& defaultParam ) const
-{
-	FOR_EACH_VEC(*this, index)
-	{
-		if ( comparerPredicate( Base()[index] ) )
-		{
-			return Base()[index];
-		}
-	}
-	return defaultParam;
-}
-
-
 template< typename T, class A >
 inline int CUtlVector<T, A>::SortedInsert( const T& src, bool (__cdecl *pfnLessFunc)( const T& src1, const T& src2 ) )
 {
@@ -752,173 +630,8 @@ inline int CUtlVector<T, A>::SortedInsert( const T& src, bool (__cdecl *pfnLessF
 template< typename T, class A >
 inline void CUtlVector<T, A>::Sort( int (__cdecl *pfnCompare)(const T *, const T *) )
 {
-	std::sort( begin(), end(),
-			   [pfnCompare] ( const T& a, const T& b ) -> bool
-			   {
-					// Some of our comparison functions are misbehaving when comparing an object to itself. Rather
-					// than wait for each function to get hit and then fixing them we short-circuit this particular
-					// case here.
-					if ( &a == &b )
-						return false;
-
-#ifdef DEBUG
-					// In debug, run the comparison both ways. If we have a sort comparator that isn't correct,
-					// some std::sort() implementations will wander off the edge of the list, so having these
-					// assertions fire for any input data is a crash waiting to happen.
-					const auto A_Cmp_B = (*pfnCompare)( &a, &b );
-					const auto B_Cmp_A = (*pfnCompare)( &b, &a );
-
-					if ( A_Cmp_B == 0 )
-					{
-						// If A == B then B == A or we have a bug in the comparison function.
-						Assert( A_Cmp_B == B_Cmp_A );
-					}
-					else
-					{
-						// If A < B, then B > A or we have a bug in the comparison function.
-						Assert( (A_Cmp_B > 0) == (B_Cmp_A < 0) );
-					}
-#endif
-				  
-					return (*pfnCompare)( &a, &b ) < 0;
-			   } );
+	qsort( begin(), Count(), sizeof( T ), (void*)pfnCompare );
 }
-
-
-//-----------------------------------------------------------------------------
-// Sorts the vector
-//-----------------------------------------------------------------------------
-template< typename T, class A >
-inline void CUtlVector<T, A>::Sort( bool (__cdecl *pfnLessFunc)( const T& src1, const T& src2 ) )
-{
-	std::sort( begin(), end(),
-			   [pfnLessFunc] ( const T& a, const T& b ) -> bool
-			   {
-					// Some of our comparison functions are misbehaving when comparing an object to itself. Rather
-					// than wait for each function to get hit and then fixing them we short-circuit this particular
-					// case here.
-					if ( &a == &b )
-						return false;
-
-#ifdef DEBUG
-					// In debug, run the comparison both ways. If we have a sort comparator that isn't correct,
-					// some std::sort() implementations will wander off the edge of the list, so having these
-					// assertions fire for any input data is a crash waiting to happen.
-					const auto A_Less_B = (*pfnLessFunc)( a, b );
-					const auto B_Less_A = (*pfnLessFunc)( b, a );
-
-					// A can be less than B, B can be less than A, or they can be equal, but A and B can't both
-					// be less than each other.
-					Assert( !A_Less_B || !B_Less_A );
-#endif
-
-					return (*pfnLessFunc)( a, b );
-			   } );
-}
-
-
-//-----------------------------------------------------------------------------
-// Sorts the vector
-//-----------------------------------------------------------------------------
-template< typename T, class A >
-inline void CUtlVector<T, A>::Sort( bool( __cdecl *pfnLessFunc )(const T& src1, const T& src2, void *pCtx), void *pLessContext )
-{
-	std::sort( begin(), end(),
-			[pfnLessFunc, pLessContext] ( const T& a, const T& b ) -> bool
-			{
-				// Some of our comparison functions are misbehaving when comparing an object to itself. Rather
-				// than wait for each function to get hit and then fixing them we short-circuit this particular
-				// case here.
-				if ( &a == &b )
-					return false;
-
-#ifdef DEBUG
-				// In debug, run the comparison both ways. If we have a sort comparator that isn't correct,
-				// some std::sort() implementations will wander off the edge of the list, so having these
-				// assertions fire for any input data is a crash waiting to happen.
-				const auto A_Less_B = (*pfnLessFunc)( a, b, pLessContext);
-				const auto B_Less_A = (*pfnLessFunc)( b, a, pLessContext );
-
-				// A can be less than B, B can be less than A, or they can be equal, but A and B can't both
-				// be less than each other.
-				Assert( !A_Less_B || !B_Less_A );
-#endif
-
-				return (*pfnLessFunc)( a, b, pLessContext);
-			} );
-}
-
-
-//-----------------------------------------------------------------------------
-// Sorts the vector
-//-----------------------------------------------------------------------------
-template< typename T, class A >
-inline void CUtlVector<T, A>::Sort_s( void *context, int (__cdecl *pfnCompare)(void *,const T *, const T *) )
-{
-	std::sort( begin(), end(),
-			   [context, pfnCompare] ( const T& a, const T& b ) -> bool
-			   {
-					// Some of our comparison functions are misbehaving when comparing an object to itself. Rather
-					// than wait for each function to get hit and then fixing them we short-circuit this particular
-					// case here.
-					if ( &a == &b )
-						return false;
-
-#ifdef DEBUG
-					// In debug, run the comparison both ways. If we have a sort comparator that isn't correct,
-					// some std::sort() implementations will wander off the edge of the list, so having these
-					// assertions fire for any input data is a crash waiting to happen.
-					const auto A_Cmp_B = (*pfnCompare)( context, &a, &b );
-					const auto B_Cmp_A = (*pfnCompare)( context, &b, &a );
-
-					if ( A_Cmp_B == 0 )
-					{
-						// If A == B then B == A or we have a bug in the comparison function.
-						Assert( A_Cmp_B == B_Cmp_A );
-					}
-					else
-					{
-						// If A < B, then B > A or we have a bug in the comparison function.
-						Assert( (A_Cmp_B > 0) == (B_Cmp_A < 0) );
-					}
-#endif
-				  
-					return (*pfnCompare)( context, &a, &b ) < 0;
-			  } );
-}
-
-
-//-----------------------------------------------------------------------------
-// Sorts the vector
-//-----------------------------------------------------------------------------
-template< typename T, class A >
-inline void CUtlVector<T, A>::Sort_s( void *context, bool (__cdecl *pfnLessFunc)( const T& src1, const T& src2, void *pCtx ) )
-{
-	std::sort( begin(), end(),
-			   [context, pfnLessFunc] ( const T& a, const T& b ) -> bool
-			   {
-					// Some of our comparison functions are misbehaving when comparing an object to itself. Rather
-					// than wait for each function to get hit and then fixing them we short-circuit this particular
-					// case here.
-					if ( &a == &b )
-						return false;
-
-#ifdef DEBUG
-					// In debug, run the comparison both ways. If we have a sort comparator that isn't correct,
-					// some std::sort() implementations will wander off the edge of the list, so having these
-					// assertions fire for any input data is a crash waiting to happen.
-					const auto A_Less_B = (*pfnLessFunc)( a, b, context );
-					const auto B_Less_A = (*pfnLessFunc)( b, a, context );
-
-					// A can be less than B, B can be less than A, or they can be equal, but A and B can't both
-					// be less than each other.
-					Assert( !A_Less_B || !B_Less_A );
-#endif
-
-					return (*pfnLessFunc)( a, b, context );
-			   } );
-}
-
 
 //-----------------------------------------------------------------------------
 // Makes sure we have enough memory allocated to store a requested # of elements
