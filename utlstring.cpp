@@ -106,27 +106,6 @@ static size_t RemoveWhitespace( char *pszString )
 	return cRemoved;
 }
 
-
-#ifndef MY_COMPILER_SUCKS
-//-----------------------------------------------------------------------------
-// Purpose: move-constructor from CUtlStringBuilder to CUtlString
-//-----------------------------------------------------------------------------
-CUtlString::CUtlString( class CUtlStringBuilder &&string )
-{
-	m_pchString = string.DetachRawPtr();
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: move-assignment from CUtlStringBuilder to CUtlString
-//-----------------------------------------------------------------------------
-CUtlString & CUtlString::operator=(class CUtlStringBuilder &&string)
-{
-	SetPtr( string.DetachRawPtr() );
-	return *this;
-}
-#endif
-
-
 //-----------------------------------------------------------------------------
 // Purpose: Helper for Format() method
 //-----------------------------------------------------------------------------

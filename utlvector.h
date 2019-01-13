@@ -17,13 +17,6 @@
 
 
 #include <string.h>
-
-#ifndef MY_COMPILER_SUCKS
-#include <algorithm>
-#include <functional>
-#include <type_traits>
-#endif
-
 #include "utlmemory.h"
 
 #define FOR_EACH_VEC( vecName, iteratorName ) \
@@ -66,13 +59,6 @@ public:
 	const T& Head() const;
 	T& Tail();
 	const T& Tail() const;
-
-	// STL compatible member functions. These allow easier use of std::sort
-	// and they are forward compatible with the C++ 11 range-based for loops.
-	iterator begin()						{ return Base(); }
-	const_iterator begin() const			{ return Base(); }
-	iterator end()							{ return Base() + Count(); }
-	const_iterator end() const				{ return Base() + Count(); }
 
 	// Gets the base address (can change when adding elements!)
 	T* Base()								{ return m_Memory.Base(); }
@@ -249,32 +235,11 @@ inline CUtlVector<T, A>::CUtlVector( int growSize, int initSize )	:
 {
 }
 
-#ifndef MY_COMPILER_SUCKS
-template< typename T, class A >
-inline CUtlVector<T, A>::CUtlVector( CUtlVector<T, A>&& src )
-	: m_Size( 0 )
-{
-	Swap( src );
-}
-#endif // MY_COMPILER_SUCKS
-
 template< typename T, class A >
 inline CUtlVector<T, A>::CUtlVector( T* pMemory, int allocationCount, int numElements )	:
 	m_Memory(pMemory, allocationCount), m_Size(numElements)
 {
 }
-
-#ifndef MY_COMPILER_SUCKS
-template< typename T, class A >
-inline CUtlVector<T, A>::CUtlVector( std::initializer_list<T> initializerList ) :
-	m_Size(0)
-{
-	EnsureCapacity( static_cast<int>( initializerList.size() ) );
-
-	for ( const auto& v : initializerList )
-		AddToTail( v );
-}
-#endif // VALVE_INITIALIZER_LIST_SUPPORT
 
 template< typename T, class A >
 inline CUtlVector<T, A>::~CUtlVector()
@@ -630,7 +595,7 @@ inline int CUtlVector<T, A>::SortedInsert( const T& src, bool (__cdecl *pfnLessF
 template< typename T, class A >
 inline void CUtlVector<T, A>::Sort( int (__cdecl *pfnCompare)(const T *, const T *) )
 {
-	qsort( begin(), Count(), sizeof( T ), (void*)pfnCompare );
+	qsort( &Head(), Count(), sizeof( T ), (void*)pfnCompare );
 }
 
 //-----------------------------------------------------------------------------
@@ -758,21 +723,6 @@ inline int CUtlVector<T, A>::InsertBefore( int elem, const T& src )
 	return elem;
 }
 
-#ifndef MY_COMPILER_SUCKS
-// Optimized AddToTail path with move constructor.
-template< typename T, class A >
-inline int CUtlVector<T, A>::AddToTail( T&& src )
-{
-	// Can't insert something that's in the list... reallocation may hose us
-	Assert( (&src < Base()) || (&src >= (Base() + Count())) );
-	int elem = m_Size;
-	GrowVector();
-	CopyConstruct( &Element( elem ), std::forward<T>( src ) );
-	return elem;
-}
-#endif
-
-
 //-----------------------------------------------------------------------------
 // Adds multiple elements, uses default constructor
 //-----------------------------------------------------------------------------
@@ -892,20 +842,6 @@ inline int CUtlVector<T, A>::Find( const T& src ) const
 	}
 	return InvalidIndex();
 }
-
-#ifndef MY_COMPILER_SUCKS
-template< typename T, class A >
-template < typename TMatchFunc >
-inline int CUtlVector<T, A>::FindMatch( TMatchFunc&& func ) const
-{
-	for ( int i = 0; i < Count(); ++i )
-	{
-		if ( func( (*this)[i] ) )
-			return i;
-	}
-	return InvalidIndex();
-}
-#endif // MY_COMPILER_SUCKS
 
 template< typename T, class A >
 inline bool CUtlVector<T, A>::HasElement( const T& src ) const

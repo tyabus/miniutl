@@ -42,9 +42,6 @@ public:
 	CUtlMemoryBase( int nSizeOfType, int nGrowSize = 0, int nInitSize = 0 );
 	CUtlMemoryBase( int nSizeOfType, void* pMemory, int numElements );
 	CUtlMemoryBase( int nSizeOfType, const void* pMemory, int numElements );
-#ifndef MY_COMPILER_SUCKS
-	CUtlMemoryBase( CUtlMemoryBase&& src );
-#endif // MY_COMPILER_SUCKS
 	~CUtlMemoryBase();
 
 	// Can we use this index?
@@ -114,9 +111,6 @@ public:
 	CUtlMemory( int nGrowSize = 0, int nInitSize = 0 );
 	CUtlMemory( T* pMemory, int numElements );
 	CUtlMemory( const T* pMemory, int numElements );
-#ifndef MY_COMPILER_SUCKS
-	CUtlMemory( CUtlMemory&& src );
-#endif // MY_COMPILER_SUCKS
 
 	// element access
 	T& operator[]( int i );
@@ -213,27 +207,12 @@ inline CUtlMemory<T>::CUtlMemory( const T* pMemory, int numElements ) : CUtlMemo
 }
 
 
-#ifndef MY_COMPILER_SUCKS
-template< class T >
-inline CUtlMemory<T>::CUtlMemory( CUtlMemory<T>&& src ) : CUtlMemoryBase( std::move( src ) )
-{
-	static_assert( sizeof( CUtlMemory<T> ) == sizeof( CUtlMemoryBase ), "Move constructor needs to be updated if there are inline members in CUtlMemory." );
-}
-#endif // MY_COMPILER_SUCKS
-
 template< class T >
 void SWAP( T &a, T &b )
 {
-#ifndef MY_COMPILER_SUCKS
-	// perform r-value reference moves, instead of value copies
-	T tmp( std::move( a ) );
-	a = std::move( b );
-	b = std::move( tmp );
-#else
 	T tmp( a );
 	a = b;
 	b = tmp;
-#endif
 }
 
 

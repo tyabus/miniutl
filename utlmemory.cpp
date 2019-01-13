@@ -38,20 +38,6 @@ m_nAllocationCount( numElements ),  m_unSizeOfElements( nSizeOfType )
 	m_nGrowSize = EXTERNAL_CONST_BUFFER_MARKER;
 }
 
-#ifndef MY_COMPILER_SUCKS
-CUtlMemoryBase::CUtlMemoryBase( CUtlMemoryBase&& src )
-{
-	// Default init this so when we destruct src it doesn't do anything.
-	m_nGrowSize = 0;
-	m_pMemory = 0;
-	m_nAllocationCount = 0;
-	m_unSizeOfElements = src.m_unSizeOfElements;
-
-	Swap( src );
-}
-#endif // MY_COMPILER_SUCKS
-
-
 CUtlMemoryBase::~CUtlMemoryBase()
 {
 	Purge();

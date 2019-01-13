@@ -152,13 +152,6 @@ public:
 	bool TruncateUTF8Bytes( size_t unMaxBytes ) { return TruncateUTF8Internal( (size_t)-1, unMaxBytes ); }
 	bool TruncateUTF8Chars( size_t unMaxChars ) { return TruncateUTF8Internal( unMaxChars, (size_t)-1 ); }
 
-#ifndef MY_COMPILER_SUCKS
-	// Move construction, rvalue assignment from like type
-	CUtlString( CUtlString &&string ) : m_pchString( string.m_pchString ) { string.m_pchString = NULL; }
-	CUtlString &operator=( CUtlString &&string ) { Swap( string ); return *this; }
-	void Set( CUtlString &&string ) { Swap( string ); }
-#endif
-
 private:
 	bool TruncateUTF8Internal( size_t unMaxChars, size_t unMaxBytes );
 	size_t ReplaceInternal( const char *pstrTarget, const char *pstrReplacement, const char *pfnCompare(const char*, const char*) );
