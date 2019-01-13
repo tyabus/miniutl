@@ -175,6 +175,8 @@ typedef size_t uintp;
 typedef ssize_t intp;
 #endif
 
+typedef unsigned int uint;
+
 //-----------------------------------------------------------------------------
 // There is no requirement that a va_list be usable in multiple calls,
 // but the Steam code does this.  Linux64 does not support reuse, whereas
