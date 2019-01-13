@@ -96,7 +96,7 @@ inline void AssertMsg( int pred, const char *fmt, ... )
 	char buf[1024];
 	va_list va;
 	va_start( va, fmt );
-	vsnprintf( buf, sizeof( buf ), fmt, va );
+	_vsnprintf( buf, sizeof( buf ), fmt, va );
 	va_end( va );
 
 	assert( pred && fmt );
@@ -141,7 +141,7 @@ static FORCEINLINE T const & Max( T const &val1, T const &val2 )
 
 #define V_ARRAYSIZE( arr ) ( sizeof((arr)) / sizeof((arr)[0]) )
 
-#ifdef _MSC_VER == 1200
+#if _MSC_VER == 1200
 // msvc6 only targets win32
 typedef char int8;
 typedef unsigned char uint8;
