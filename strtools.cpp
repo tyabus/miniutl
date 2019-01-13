@@ -2,10 +2,8 @@
 
 #include <utlvector.h>
 
-#ifdef _WIN32
-	#include "winlite.h"
-#else
-	#include <unistd.h>
+#ifndef _WIN32
+#include <unistd.h>
 #endif
 
 
