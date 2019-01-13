@@ -109,9 +109,28 @@ public:
 	inline const char* SetUint64( uint64 un64 )		{ NUMSTR_CHECK_FAST( un64, uint64 )	m_nLength = V_snprintf( m_szBuf, sizeof(m_szBuf), "%llu", un64 ); return m_szBuf; }
 #endif
 
-	inline const char* SetDouble( double f )		{ if ( f == 0.0  && !signbit( f ) ) NUMSTR_FAST_DIGIT( 0 ); if ( f == 1.0  ) NUMSTR_FAST_DIGIT( 1 ); m_nLength = V_snprintf( m_szBuf, sizeof(m_szBuf), "%.18g", f ); return m_szBuf; }
-	inline const char* SetFloat( float f )			{ if ( f == 0.0f && !signbit( f ) ) NUMSTR_FAST_DIGIT( 0 ); if ( f == 1.0f ) NUMSTR_FAST_DIGIT( 1 ); m_nLength = V_snprintf( m_szBuf, sizeof(m_szBuf), "%.18g", f ); return m_szBuf; }
-
+	inline const char* SetDouble( double f )
+	{
+#ifndef _MSC_VER
+		if ( f == 0.0  && !signbit( f ) )
+			NUMSTR_FAST_DIGIT( 0 );
+#endif
+		if ( f == 1.0  )
+			NUMSTR_FAST_DIGIT( 1 );
+		m_nLength = V_snprintf( m_szBuf, sizeof(m_szBuf), "%.18g", f );
+		return m_szBuf;
+	}
+	inline const char* SetFloat( float f )
+	{
+#ifndef _MSC_VER
+		if ( f == 0.0f && !signbit( f ) )
+			NUMSTR_FAST_DIGIT( 0 );
+#endif
+		if ( f == 1.0f )
+			NUMSTR_FAST_DIGIT( 1 );
+		m_nLength = V_snprintf( m_szBuf, sizeof(m_szBuf), "%.18g", f );
+		return m_szBuf;
+	}
 	//SDR_PUBLIC inline const char* SetHexUint64( uint64 un64 )	{ V_binarytohex( (byte *)&un64, sizeof( un64 ), m_szBuf, sizeof( m_szBuf ) ); m_nLength = V_strlen(m_szBuf); return m_szBuf; }
 
 #undef NUMSTR_FAST_DIGIT
@@ -137,208 +156,5 @@ protected:
 	int m_nLength;
 
 };
-
-#define FMTSTR_STD_LEN 256
-
-// CFMTSTR_MAX_STACK_ALLOC is protected so it can be specialized for architecture,
-// bitness, or whatnot.
-#ifndef CFMTSTR_MAX_STACK_ALLOC
-#define CFMTSTR_MAX_STACK_ALLOC 1024
-#endif
-
-template<int SIZE_BUF, bool ON_STACK>
-class CStrFmtSpecialized
-{
-};
-
-template<int SIZE_BUF>
-class CStrFmtSpecialized<SIZE_BUF, /*ON_STACK=*/true>
-{
-public:
-	char m_szBuf[SIZE_BUF];
-};
-
-template<int SIZE_BUF>
-class CStrFmtSpecialized<SIZE_BUF, /*ON_STACK=*/false>
-{
-public:
-	CStrFmtSpecialized()
-	{
-		m_szBuf = new char[SIZE_BUF];
-	}
-
-	~CStrFmtSpecialized() 
-	{
-		delete [] m_szBuf;
-	}
-
-	char *m_szBuf;
-};
-
-template <int SIZE_BUF, bool QT = QUIET_TRUNCATION, bool ON_STACK = (SIZE_BUF <= CFMTSTR_MAX_STACK_ALLOC ) >
-class CFmtStrN : public CStrFmtSpecialized< SIZE_BUF, ON_STACK >
-{
-	typedef CStrFmtSpecialized< SIZE_BUF, ON_STACK > BaseClass;
-public:
-	CFmtStrN()	
-	{ 
-		BaseClass::m_szBuf[0] = 0; 
-		m_nLength = 0;
-	}
-	
-	// Standard C formatting
-	CFmtStrN( PRINTF_FORMAT_STRING const char *pszFormat, ... ) FMTFUNCTION( 2, 3 )
-	{
-		FmtStrVSNPrintf( BaseClass::m_szBuf, SIZE_BUF, m_nLength, QT, pszFormat, pszFormat );
-	}
-
-	// Use this for pass-through formatting
-	CFmtStrN( const char ** ppszFormat, ... ) 	
-	{
-		FmtStrVSNPrintf( BaseClass::m_szBuf, SIZE_BUF, m_nLength, QT, *ppszFormat, ppszFormat ); 
-	}
-
-	// Explicit reformat
-	const char *Format( PRINTF_FORMAT_STRING const char *pszFormat, ... ) FMTFUNCTION( 2, 3 )
-	{
-		FmtStrVSNPrintf( BaseClass::m_szBuf, SIZE_BUF, m_nLength, QT, pszFormat, pszFormat );
-		return BaseClass::m_szBuf;
-	}
-
-	// Use for access
-	operator const char *() const				{ return BaseClass::m_szBuf; }
-	const char *Get() const						{ return BaseClass::m_szBuf; }
-	const char *String() const					{ return BaseClass::m_szBuf; }
-
-	char *Access()								{ return BaseClass::m_szBuf; }
-	int Length() const { return m_nLength; }
-
-	CFmtStrN< SIZE_BUF, QT, ON_STACK > & operator=( const char *pchValue )
-	{
-		if ( !QT )
-		{
-			int nLen = V_strlen( pchValue );
-			AssertMsg( nLen < SIZE_BUF-1, "Truncation in CFmtStr operator=" );
-		}
-
-		m_nLength = CopyStringLength( BaseClass::m_szBuf, pchValue, SIZE_BUF );
-		return *this;
-	}
-
-	CFmtStrN< SIZE_BUF, QT, ON_STACK > & operator+=( const char *pchValue )
-	{
-		Append( pchValue );
-		return *this; 
-	}
-
-	void Clear()
-	{
-		BaseClass::m_szBuf[0] = 0; 
-		m_nLength = 0;
-	}
-
-	void AppendFormat( PRINTF_FORMAT_STRING const char *pchFormat, ... ) FMTFUNCTION( 2, 3 )
-	{
-		char *pchEnd = BaseClass::m_szBuf + m_nLength;
-		int nFormattedLength = 0;
-		FmtStrVSNPrintf( pchEnd, SIZE_BUF - m_nLength, nFormattedLength, QT, pchFormat, pchFormat );
-		m_nLength = m_nLength + nFormattedLength;
-	}
-
-	void AppendFormatV( const char *pchFormat, va_list args );
-	void Append( const char *pchValue )
-	{
-		if ( !QT )
-		{
-			int nLen = V_strlen( pchValue );
-			AssertMsg( nLen < ( SIZE_BUF - m_nLength ), "Truncation in CFmtStr::Append" );
-		}
-
-		char *pchDest = BaseClass::m_szBuf + m_nLength;
-		const char *pchSource = pchValue;
-		int cbRemaining = SIZE_BUF - m_nLength;
-		int nAppendedLength = CopyStringLength( pchDest, pchSource, cbRemaining );
-
-		m_nLength = m_nLength + nAppendedLength;
-	}
-
-	void AppendIndent( uint32 unCount, char chIndent = '\t' );
-	void Set( const char *pchValue, int nSize = -1 );
-
-protected:
-	int CopyStringLength( char *pstrDest, const char *pstrSource, int nMaxLength )
-	{
-		int nCount = nMaxLength;
-		char *pstrStart = pstrDest;
-
-		while ( 0 < nCount && 0 != ( *pstrDest++ = *pstrSource++ ) )
-			nCount--;
-
-		int nLength = 0;
-		if ( nMaxLength > 0 )
-		{
-			pstrDest[-1] = 0;
-			nLength = pstrDest - pstrStart - 1;
-		}
-
-		return nLength;
-	}
-
-protected:
-	int m_nLength;
-};
-
-
-template< int SIZE_BUF, bool QT, bool ON_STACK >
-void CFmtStrN< SIZE_BUF, QT, ON_STACK >::AppendIndent( uint32 unCount, char chIndent )
-{
-	Assert( Length() + unCount < SIZE_BUF );
-	if( Length() + unCount >= SIZE_BUF )
-		unCount = SIZE_BUF - (1+Length());
-	for ( uint32 x = 0; x < unCount; x++ )
-	{
-		BaseClass::m_szBuf[ m_nLength++ ] = chIndent;
-	}
-	BaseClass::m_szBuf[ m_nLength ] = '\0';
-}
-
-template< int SIZE_BUF, bool QT, bool ON_STACK >
-void CFmtStrN< SIZE_BUF, QT, ON_STACK >::AppendFormatV( const char *pchFormat, va_list args )
-{
-	int cubPrinted = V_vsnprintf( BaseClass::m_szBuf+Length(), SIZE_BUF - Length(), pchFormat, args );
-	m_nLength += cubPrinted;
-}
-
-
-template< int SIZE_BUF, bool QT, bool ON_STACK >
-void CFmtStrN< SIZE_BUF, QT, ON_STACK >::Set( const char *pchValue, int nSize )
-{
-	int nMaxLength =  nSize == -1 ? SIZE_BUF-1 : Min( nSize, SIZE_BUF-1 );
-	m_nLength = CopyStringLength( BaseClass::m_szBuf, pchValue, nMaxLength );
-}
-
-#if defined(POSIX)
-#pragma GCC visibility pop
-#endif
-
-//-----------------------------------------------------------------------------
-//
-// Purpose: Default-sized string formatter
-//
-
-typedef CFmtStrN< FMTSTR_STD_LEN > CFmtStr;
-typedef CFmtStrN< FMTSTR_STD_LEN, true > CFmtStrQuietTruncation;
-typedef CFmtStrN<32> CFmtStr32;
-typedef CFmtStrN<1024> CFmtStr1024;
-typedef CFmtStrN<8192> CFmtStrMax;
-
-//=============================================================================
-
-const int k_cchFormattedDate = 64;
-const int k_cchFormattedTime = 32;
-bool BGetLocalFormattedDateAndTime( time_t timeVal, char *pchDate, int cubDate, char *pchTime, int cubTime, bool bIncludeSeconds = false, bool bShortDateFormat = false );
-bool BGetLocalFormattedDate( time_t timeVal, char *pchDate, int cubDate, bool bShortDateFormat = false );
-bool BGetLocalFormattedTime( time_t timeVal, char *pchTime, int cubTime, bool bIncludeSeconds = false );
-bool BGetLocalFormattedHourFromInt( int nHour, char *pchHour, int cubHour );
 
 #endif // FMTSTR_H
