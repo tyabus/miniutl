@@ -205,6 +205,12 @@ public:
     va_list m_ReuseList;
 };
 
+#ifdef _MSC_VER
+#include <new.h>
+#else
+#include <new>
+#endif
+
 template <class T>
 inline void Construct( T* pMemory )
 {
