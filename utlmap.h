@@ -279,7 +279,6 @@ public:
 	void ValidateSelfAndElements( CValidator &validator, const char *pchName );
 #endif // DBGFLAG_VALIDATE
 
-
 protected:
 
 	// Disallow copy construction and assignment for now
@@ -307,31 +306,21 @@ protected:
 	typedef CUtlRBTree<Node_t, I, CKeyLess> CTree;
 
 	CTree *AccessTree()	{ return &m_Tree; }
-
+	CTree 	   m_Tree;
+	
 public:
-	// STL / C++11-style iterators (iterating Node_t elements of the underlying RBTree)
-	typedef typename CTree::iterator iterator;
-	typedef typename CTree::const_iterator const_iterator;
-	iterator begin() { return m_Tree.begin(); }
-	iterator end() { return m_Tree.end(); }
-	const_iterator begin() const { return m_Tree.begin(); }
-	const_iterator end() const { return m_Tree.end(); }
-
-	// STL / C++11-style iterator using storage order (effectively unordered, but faster)
 	typedef typename CTree::ProxyTypeIterateUnordered ProxyTypeIterateUnordered;
-	typedef typename ProxyTypeIterateUnordered::iterator unordered_iterator;
-	typedef typename ProxyTypeIterateUnordered::const_iterator unordered_const_iterator;
 	ProxyTypeIterateUnordered& IterateUnordered() { return m_Tree.IterateUnordered(); }
 	const ProxyTypeIterateUnordered& IterateUnordered() const { return m_Tree.IterateUnordered(); }
-
-protected:
-	CTree 	   m_Tree;
 };
 
 // Same as CUtlMap, but less func defaults to be CDefLess instead of
 // function pointer.
 template <typename K, typename T, typename L = CDefLess<K> >
-using CUtlOrderedMap = CUtlMap< K, T, int, L >;
+// using CUtlOrderedMap = CUtlMap< K, T, int, L >;
+class CUtlOrderedMap : public CUtlMap<K, T, int, L>
+{
+};
 
 //-----------------------------------------------------------------------------
 // Data and memory validation
