@@ -136,7 +136,7 @@ template <> inline bool CDefOps<char *>::LessFunc( char * const &lhs, char * con
 
 //-------------------------------------
 
-#if defined( _MSC_VER ) && _MSC_VER < 1600
+#if (defined( _MSC_VER ) && _MSC_VER < 1600) || __cplusplus < 2011L
 #define MAP_INDEX_TYPE( mapName ) int
 #else
 #define MAP_INDEX_TYPE( mapName ) \
@@ -463,7 +463,16 @@ public:
 		typedef I IndexType_t;
 		T &Element( I i ) { return reinterpret_cast<CUtlRBTree*>(this)->Element( i ); }
 		const T &Element( I i ) const { return reinterpret_cast<const CUtlRBTree*>(this)->Element( i ); }
-		I IteratorNext( I i ) const { auto pTree = reinterpret_cast<const CUtlRBTree*>(this); while ( ++i < pTree->MaxElement() ) { if ( pTree->IsValidIndex( i ) ) return i; } return INVALID_RBTREE_IDX; }
+		I IteratorNext( I i ) const
+		{
+			const CUtlRBTree* pTree = reinterpret_cast<const CUtlRBTree*>(this);
+			while ( ++i < pTree->MaxElement() )
+			{
+				if ( pTree->IsValidIndex( i ) )
+					return i;
+			}
+			return INVALID_RBTREE_IDX;
+		}
 	};
 	ProxyTypeIterateUnordered &IterateUnordered() { return *reinterpret_cast<ProxyTypeIterateUnordered*>(this); }
 	const ProxyTypeIterateUnordered &IterateUnordered() const { return *reinterpret_cast<const ProxyTypeIterateUnordered*>(this); }
@@ -653,12 +662,14 @@ inline CUtlRBTree<T, I, L, E>& CUtlRBTree<T, I, L, E>::operator=( const CUtlRBTr
 	RemoveAll();
 	EnsureCapacity( other.Count() );
 	m_LessFunc = other.m_LessFunc;
-	
-	FOR_EACH_RBTREE_FAST( other, i )
+
+	for ( I i = 0; i < other.MaxElement(); ++i )
 	{
+		if ( !other.IsValidIndex( i ) )
+			continue;
 		Insert( other[i] );
 	}
-	
+
 	return *this;
 }
 
