@@ -102,13 +102,15 @@ inline void AssertMsg( int pred, const char *fmt, ... )
 	assert( pred && fmt );
 }
 
-#define AssertMsg1( x, msg, msg1 ) AssertMsg( x, msg, msg1 );
+#define AssertMsg1( x, msg, msg1 ) AssertMsg( x, msg, msg1 )
+#define DbgAssertMsg1( x, msg, msg1 ) AssertMsg( x, msg, msg1 )
 #define AssertMsg2( x, msg, msg1, msg2 ) AssertMsg( x, msg, msg1, msg2 )
 #define AssertEquals( _exp, _expectedValue ) AssertMsg2( (_exp) == (_expectedValue), "Expected %d but got %d!", (_expectedValue), (_exp) )
 #else
 #define AssertMsg( x, msg ) ( x )
 #define AssertMsg1( x, msg, msg1 ) ( x )
 #define AssertMsg2( x, msg, msg1, msg2 ) ( x )
+#define DbgAssertMsg1( x, msg, msg1 ) ( x )
 #define AssertEquals( x, y ) ( x )
 #endif
 
@@ -120,6 +122,12 @@ inline void AssertMsg( int pred, const char *fmt, ... )
 #define real_free free
 #define SecureZeroMemory( ptr, len ) memset( ptr, 0, len )
 #define Msg       printf
+
+inline void Error( const char *msg )
+{
+	puts( msg );
+	abort();
+}
 
 #define MEM_ALLOC_CREDIT_CLASS()
 
