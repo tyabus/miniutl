@@ -199,7 +199,7 @@ class CReuseVaList
 public:
     CReuseVaList( va_list List )
     {
-#if defined(LINUX) || defined(OSX) || defined(IOS)
+#if __STDC_VERSION__ >= 199901L || __cplusplus >= 201103L // va_copy is in C99 or C++11
 	va_copy( m_ReuseList, List );
 #else
 	m_ReuseList = List;
@@ -207,9 +207,7 @@ public:
     }
     ~CReuseVaList()
     {
-#if defined(LINUX) || defined(OSX)
 	va_end( m_ReuseList );
-#endif
     }
 
     va_list m_ReuseList;
