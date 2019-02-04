@@ -113,26 +113,17 @@ size_t CUtlString::FormatV( const char *pFormat, va_list args )
 {
 	size_t len = 0;
 #ifdef _WIN32
-	// how much space will we need?
-	// size_t mlen = _vscprintf( pFormat, args );
-	size_t mlen;
-	{
-		CReuseVaList ReuseArgs( args );
-		mlen = _vsnprintf( NULL, 0, pFormat, ReuseArgs.m_ReuseList );
-	}
+	char buf[4096];
 
+	len = _vsnprintf( buf, sizeof( buf ), pFormat, args );
+
+	Assert( len >= 0 );
+	Assert( len < sizeof( buf ));
 
 	// get it
 	FreePv( m_pchString );
-	m_pchString = NULL;
-	m_pchString = (char*) PvAlloc( mlen+1 );
-
-	// format into that space, which is certainly enough
-	len = _vsnprintf( m_pchString, mlen+1, pFormat, args );
-
-	Assert( len >= 0 );
-	Assert( len <= mlen );
-
+	m_pchString = (char *)PvAlloc( len + 1 );
+	strcpy( m_pchString, buf );
 #elif defined ( _PS3 )
 
 	// ignore the PS3 documentation about vsnprintf returning -1 when the string is too small. vsprintf seems to do the right thing (least at time of
@@ -156,12 +147,12 @@ size_t CUtlString::FormatV( const char *pFormat, va_list args )
 	// Len < 0 represents an overflow
 	if( buf )
 	{
-        // We need to get the string into PvFree-compatible memory, which
-        // we can't assume is directly interoperable with the malloc memory
-        // that vasprintf returned (definitely not compatible with a debug
-        // allocator, for example).
-        Set( buf );
-        real_free( buf );
+		// We need to get the string into PvFree-compatible memory, which
+		// we can't assume is directly interoperable with the malloc memory
+		// that vasprintf returned (definitely not compatible with a debug
+		// allocator, for example).
+		Set( buf );
+		free( buf );
 	}
 #endif
 	return len;
@@ -174,26 +165,17 @@ size_t CUtlString::FormatV( const char *pFormat, va_list args )
 size_t CUtlString::VAppendFormat( const char *pFormat, va_list args )
 {
 	size_t len = 0;
-	char *pstrFormatted = NULL;
 #ifdef _WIN32
-	// how much space will we need?
-	// size_t mlen = _vscprintf( pFormat, args );
-	size_t mlen;
-	{
-		CReuseVaList ReuseArgs( args );
-		mlen = _vsnprintf( NULL, 0, pFormat, ReuseArgs.m_ReuseList );
-	}
-
-	// get it
-	pstrFormatted = (char*) PvAlloc( mlen+1 );
+	char pstrFormatted[4096];
 
 	// format into that space, which is certainly enough
 	len = _vsnprintf( pstrFormatted, mlen+1, pFormat, args );
 
-	Assert( len > 0 );
-	Assert( len <= mlen );
+	Assert( len >= 0 );
+	Assert( len < sizeof( pstrFormatted ));
 
 #elif defined ( _PS3 )
+	char *pstrFormatted = NULL;
 
 	// ignore the PS3 documentation about vsnprintf returning -1 when the string is too small. vsprintf seems to do the right thing (least at time of
 	// implementation) and returns the number of characters needed when you pass in a buffer that is too small
@@ -206,6 +188,7 @@ size_t CUtlString::VAppendFormat( const char *pFormat, va_list args )
 	}
 
 #else
+	char *pstrFormatted = NULL;
 	len = vasprintf( &pstrFormatted, pFormat, args );
 #endif
 
@@ -213,10 +196,12 @@ size_t CUtlString::VAppendFormat( const char *pFormat, va_list args )
 	if ( pstrFormatted != NULL )
 	{
 		Append( pstrFormatted, len );
-#if defined( POSIX )
-		real_free( pstrFormatted );
-#else
+#if defined( _WIN32 )
+		// no need to free a buffer on stack
+#elif defined( _PS3 )
 		FreePv( pstrFormatted );
+#else
+		free( pstrFormatted );
 #endif
 	}
 

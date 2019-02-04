@@ -119,7 +119,6 @@ inline void AssertMsg( int pred, const char *fmt, ... )
 #define PvAlloc   malloc
 #define PvRealloc realloc
 #define FreePv    free
-#define real_free free
 #define SecureZeroMemory( ptr, len ) memset( ptr, 0, len )
 #define Msg       printf
 
@@ -184,34 +183,6 @@ typedef ssize_t intp;
 #endif
 
 typedef unsigned int uint;
-
-//-----------------------------------------------------------------------------
-// There is no requirement that a va_list be usable in multiple calls,
-// but the Steam code does this.  Linux64 does not support reuse, whereas
-// Windows does, so Linux64 breaks on code that was written and working
-// on Windows.  Fortunately Linux has va_copy, which provides a simple
-// way to let a va_list be used multiple times.  Unfortunately Windows
-// does not have va_copy, so here we provide things to hide the difference.
-//-----------------------------------------------------------------------------
-
-class CReuseVaList
-{
-public:
-    CReuseVaList( va_list List )
-    {
-#if __STDC_VERSION__ >= 199901L || __cplusplus >= 201103L // va_copy is in C99 or C++11
-	va_copy( m_ReuseList, List );
-#else
-	m_ReuseList = List;
-#endif
-    }
-    ~CReuseVaList()
-    {
-	va_end( m_ReuseList );
-    }
-
-    va_list m_ReuseList;
-};
 
 #ifdef _MSC_VER
 #include <new.h>
