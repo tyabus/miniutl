@@ -119,7 +119,9 @@ inline void AssertMsg( int pred, const char *fmt, ... )
 #define PvAlloc   malloc
 #define PvRealloc realloc
 #define FreePv    free
+#ifndef _WIN32 // don't redefine Win32 function
 #define SecureZeroMemory( ptr, len ) memset( ptr, 0, len )
+#endif
 #define Msg       printf
 
 inline void Error( const char *msg )
@@ -161,9 +163,6 @@ typedef unsigned int uint32;
 
 typedef __int64 int64;
 typedef unsigned __int64 uint64;
-
-typedef int uintp;
-typedef unsigned int intp;
 #else
 #include <stdint.h>
 typedef int8_t int8;
@@ -177,9 +176,6 @@ typedef uint32_t uint32;
 
 typedef int64_t int64;
 typedef uint64_t uint64;
-
-typedef size_t uintp;
-typedef ssize_t intp;
 #endif
 
 typedef unsigned int uint;
