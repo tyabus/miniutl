@@ -169,7 +169,7 @@ size_t CUtlString::VAppendFormat( const char *pFormat, va_list args )
 	char pstrFormatted[4096];
 
 	// format into that space, which is certainly enough
-	len = _vsnprintf( pstrFormatted, mlen+1, pFormat, args );
+	len = _vsnprintf( pstrFormatted, sizeof(pstrFormatted), pFormat, args );
 
 	Assert( len >= 0 );
 	Assert( len < sizeof( pstrFormatted ));

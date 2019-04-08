@@ -119,7 +119,7 @@ inline void AssertMsg( int pred, const char *fmt, ... )
 #define PvAlloc   malloc
 #define PvRealloc realloc
 #define FreePv    free
-#ifndef _WIN32 // don't redefine Win32 function
+#if !defined _WIN32 || defined(_MSC_VER) && ( _MSC_VER < 1900 )  // don't redefine Win32 function
 #define SecureZeroMemory( ptr, len ) memset( ptr, 0, len )
 #endif
 #define Msg       printf
