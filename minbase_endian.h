@@ -78,7 +78,13 @@ inline T QWordSwapC( T dw )
 #endif
 
 #if !defined(__BYTE_ORDER) && !defined(__LITTLE_ENDIAN) && !defined(__BIG_ENDIAN)
+#if defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__) && defined(__ORDER_LITTLE_ENDIAN__) // some compilers define this
+#define __BYTE_ORDER __BYTE_ORDER__
+#define __LITTLE_ENDIAN __ORDER_LITTLE_ENDIAN__
+#define __BIG_ENDIAN __ORDER_BIG_ENDIAN__
+#else
 #error
+#endif
 #endif
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN

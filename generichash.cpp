@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <generichash.h>
 #include <strtools.h>
+#include "minbase_endian.h"
 
 #if defined(_MSC_VER) && _MSC_VER > 1200
 #define ROTL32(x,y)	_rotl(x,y)
@@ -35,16 +36,8 @@ static inline uint64 rotl64( uint64 x, int8 r )
 
 #ifdef _MSC_VER
 #define BIG_CONSTANT(x) (x)
-#define LittleLong(x) (x) //!!!
 #else	// defined(_MSC_VER)
 #define BIG_CONSTANT(x) (x##LLU)
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define LittleLong( x ) ( x )
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#define LittleLong(x) (((int)(((x)&255)<<24)) + ((int)((((x)>>8)&255)<<16)) + ((int)(((x)>>16)&255)<<8) + (((x) >> 24)&255))
-#else // __BYTE_ORDER__
-#error
-#endif // __BYTE_ORDER__
 #endif // !defined(_MSC_VER)
 
 //-----------------------------------------------------------------------------
@@ -64,7 +57,7 @@ uint32 MurmurHash3_32( const void * key, size_t len, uint32 seed, bool bCaseless
 
 	for(ptrdiff_t i = -nblocks; i; i++)
 	{
-		uint32 k1 = LittleLong(blocks[i]);
+		uint32 k1 = LittleDWord(blocks[i]);
 		k1 &= uSourceBitwiseAndMask;
 
 		k1 *= 0xcc9e2d51;
