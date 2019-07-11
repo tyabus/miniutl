@@ -39,7 +39,6 @@ inline uint32 HashStringCaseless( const char *pszKey, size_t len )
 	return MurmurHash3_32( pszKey, len, 1047 /*anything will do for a seed*/, true );
 }
 
-#if	!defined(_MINIMUM_BUILD_)
 inline uint32 HashString( const char *pszKey )
 {
 	return HashString( pszKey, strlen( pszKey ) );
@@ -49,26 +48,13 @@ inline uint32 HashStringCaseless( const char *pszKey )
 {
 	return HashStringCaseless( pszKey, strlen( pszKey ) );
 }
-#endif
 
 inline uint32 HashInt64( uint64 h )
 {
 	// roughly equivalent to MurmurHash3_32( &lower32, sizeof(uint32), upper32_as_seed )...
 	// theory being that most of the entropy is in the lower 32 bits and we still mix
 	// everything together at the end, so not fully shuffling upper32 is not a big deal
-
-    //
-	//	On the 32 bit compiler in various modes, this form of the expression generates
-	//	a CRT call to do a 64bit shift in 32 bit registers.  
-	//	Well I need this code to compile without any CRT references - so use this expression instead.
-	//
-#if defined(_MSC_VER) && defined(_M_IX86) && defined(_MINIMUM_BUILD_)
-	uint32 h1 = reinterpret_cast<uint32*>( &h )[1];
-#else
-    uint32  h1 = static_cast<uint32>( h>>32 );
-#endif
-
-
+	uint32 h1 = static_cast<uint32>( h>>32 );
 	uint32 k1 = (uint32)h;
 
 	k1 *= 0xcc9e2d51;
@@ -138,7 +124,6 @@ struct HashFunctor
 	}
 };
 
-#if	!defined(_MINIMUM_BUILD_)
 template<>
 struct HashFunctor<char *>
 {
@@ -150,7 +135,7 @@ struct HashFunctor<char *>
 };
 
 template<>
-struct HashFunctor<const char *>
+struct HashFunctor<char const *>
 {
 	typedef uint32 TargetType;
 	TargetType operator()(const char *key) const
@@ -177,7 +162,6 @@ struct HashFunctorUnpaddedStructure
 		return HashItemAsBytes( key );
 	}
 };
-#endif	// _MINIMUM_BUILD_
 
 //-----------------------------------------------------------------------------
 

@@ -16,36 +16,35 @@
 #include <generichash.h>
 #include <strtools.h>
 
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define LittleLong( x ) ( x )
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#define LittleLong(x) (((int)(((x)&255)<<24)) + ((int)((((x)>>8)&255)<<16)) + ((int)(((x)>>16)&255)<<8) + (((x) >> 24)&255))
-#endif
-
-#if defined(_MSC_VER)
-
+#if defined(_MSC_VER) && _MSC_VER > 1200
 #define ROTL32(x,y)	_rotl(x,y)
 #define ROTL64(x,y)	_rotl64(x,y)
-
-#define BIG_CONSTANT(x) (x)
-
-#else	// defined(_MSC_VER)
-
+#else // defined(_MSC_VER) && _MSC_VER > 1200
 static inline uint32 rotl32( uint32 x, int8 r )
 {
 	return ( x << r ) | ( x >> ( 32 - r ) );
 }
-
 static inline uint64 rotl64( uint64 x, int8 r )
 {
 	return ( x << r ) | ( x >> ( 64 - r ) );
 }
-
 #define	ROTL32(x,y)	rotl32(x,y)
 #define ROTL64(x,y)	rotl64(x,y)
 
-#define BIG_CONSTANT(x) (x##LLU)
+#endif // !defined(_MSC_VER)
 
+#ifdef _MSC_VER
+#define BIG_CONSTANT(x) (x)
+#define LittleLong(x) (x) //!!!
+#else	// defined(_MSC_VER)
+#define BIG_CONSTANT(x) (x##LLU)
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define LittleLong( x ) ( x )
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define LittleLong(x) (((int)(((x)&255)<<24)) + ((int)((((x)>>8)&255)<<16)) + ((int)(((x)>>16)&255)<<8) + (((x) >> 24)&255))
+#else // __BYTE_ORDER__
+#error
+#endif // __BYTE_ORDER__
 #endif // !defined(_MSC_VER)
 
 //-----------------------------------------------------------------------------

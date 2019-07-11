@@ -38,25 +38,13 @@ struct EqualityFunctor<char *>
 };
 
 template<>
-struct EqualityFunctor<const char *>
+struct EqualityFunctor<char const *>
 {
 	bool operator()(const char *a, const char *b) const
 	{
 		return !strcmp( a, b );
 	}
 };
-
-template <typename T>
-bool DefEqualityFunc( T a, T b )
-{
-	return a == b;
-}
-
-template <>
-bool DefEqualityFunc<char *>( char *a, char *b )
-{
-	return !strcmp( a, b );
-}
 
 //-----------------------------------------------------------------------------
 //
@@ -232,6 +220,7 @@ protected:
 	IndexType_t m_iNodeFreeListHead;
 
 public:
+#ifndef MY_COMPILER_SUCKS
 	// STL / C++11-style iterators (unspecified / in-memory order!)
 	struct IterateKeyElemProxyAlias
 	{
@@ -251,6 +240,7 @@ public:
 	};
 
 	friend struct IterateKeyElemProxyAlias;
+#endif
 
 protected:
 	IndexType_t m_cElements;
@@ -320,11 +310,11 @@ inline int CUtlHashMap<K,T,L,H>::InsertUnconstructed( const KeyType_t &key, int 
 	//	::OutputDebugStr( CFmtStr( "insert %d into bucket %d\n", key, iBucket ).Access() );
 	LinkNodeIntoBucket( iBucket, iNewNode );
 
-    // Initialized to placate the compiler's uninitialized value checking.
-    if ( piNodeExistingIfDupe )
-    {
-        *piNodeExistingIfDupe = InvalidIndex();
-    }
+	// Initialized to placate the compiler's uninitialized value checking.
+	if ( piNodeExistingIfDupe )
+	{
+		*piNodeExistingIfDupe = InvalidIndex();
+	}
     
 	// return the new node
 	return iNewNode;
