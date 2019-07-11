@@ -98,8 +98,6 @@ inline uint32 HashInt( uint32 h )
 	return h;
 }
 
-
-
 template <typename T>
 inline uint32 HashItemAsBytes( const T&item )
 {
