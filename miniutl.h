@@ -204,5 +204,38 @@ inline void Destruct( T* pMemory )
 	pMemory->~T();
 }
 
+namespace basetypes
+{
+	template <class T>
+	inline bool IsPowerOf2( T n )
+	{
+		return n > 0 && (n & (n - 1)) == 0;
+	}
+
+	template <class T1, class T2>
+	inline T2 ModPowerOf2( T1 a, T2 b )
+	{
+		return T2( a ) & (b - 1);
+	}
+
+	template <class T>
+	inline T RoundDownToMultipleOf( T n, T m )
+	{
+		return n - (IsPowerOf2( m ) ? ModPowerOf2( n, m ) : (n%m));
+	}
+
+	template <class T>
+	inline T RoundUpToMultipleOf( T n, T m )
+	{
+		if ( !n )
+		{
+			return m;
+		}
+		else
+		{
+			return RoundDownToMultipleOf( n + m - 1, m );
+		}
+	}
+}
 
 #endif // MINIUTL_H

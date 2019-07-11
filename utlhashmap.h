@@ -14,9 +14,49 @@
 
 #include "bitstring.h"
 #include "utlvector.h"
+#include "generichash.h"
 
 #define FOR_EACH_HASHMAP( mapName, iteratorName ) \
 	for ( int iteratorName = 0; iteratorName < (mapName).MaxElement(); ++iteratorName ) if ( !(mapName).IsValidIndex( iteratorName ) ) continue; else
+
+template<typename T>
+struct EqualityFunctor
+{
+	bool operator()(const T &a, const T &b) const
+	{
+		return a == b;
+	}
+};
+
+template<>
+struct EqualityFunctor<char *>
+{
+	bool operator()(const char *a, const char *b) const
+	{
+		return !strcmp( a, b );
+	}
+};
+
+template<>
+struct EqualityFunctor<const char *>
+{
+	bool operator()(const char *a, const char *b) const
+	{
+		return !strcmp( a, b );
+	}
+};
+
+template <typename T>
+bool DefEqualityFunc( T a, T b )
+{
+	return a == b;
+}
+
+template <>
+bool DefEqualityFunc<char *>( char *a, char *b )
+{
+	return !strcmp( a, b );
+}
 
 //-----------------------------------------------------------------------------
 //
@@ -32,7 +72,7 @@
 // to be explicit in the equality operation.
 //
 //-----------------------------------------------------------------------------
-template <typename K, typename T, typename L, typename H > 
+template <typename K, typename T, typename L = EqualityFunctor<K>, typename H = HashFunctor<K> >
 class CUtlHashMap
 {
 public:
@@ -230,7 +270,7 @@ inline int CUtlHashMap<K,T,L,H>::InsertUnconstructed( const KeyType_t &key, int 
 {
 	// make sure we have room in the hash table
 	if ( m_cElements >= m_vecHashBuckets.Count() )
-		EnsureCapacity( MAX( 16, m_vecHashBuckets.Count() * 2 ) );
+		EnsureCapacity( Max( 16, m_vecHashBuckets.Count() * 2 ) );
 	if ( m_cElements >= m_memNodes.Count() )
 		m_memNodes.Grow( m_memNodes.Count() * 2 );
 
@@ -385,7 +425,7 @@ inline void CUtlHashMap<K,T,L,H>::EnsureCapacity( int amount )
 
 	if ( amount <= m_vecHashBuckets.Count() )
 		return;
-	int cBucketsNeeded = MAX( 16, m_vecHashBuckets.Count() );
+	int cBucketsNeeded = Max( 16, m_vecHashBuckets.Count() );
 	while ( cBucketsNeeded < amount )
 		cBucketsNeeded *= 2;
 
@@ -497,7 +537,7 @@ inline int CUtlHashMap<K,T,L,H>::Find( const KeyType_t &key ) const
 		return iNode;
 
 	// stop before calling ModPowerOf2( hash, 0 ), which just returns the 32-bit hash, overflowing m_vecHashBuckets
-	IndexType_t cMinBucketsToModAgainst = MAX( 1, m_nMinRehashedBucket );
+	IndexType_t cMinBucketsToModAgainst = Max( 1, m_nMinRehashedBucket );
 
 	// not found? we may have to look in older buckets
 	cBucketsToModAgainst >>= 1;
