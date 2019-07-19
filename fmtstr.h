@@ -78,9 +78,6 @@ public:
 	explicit CNumStr( int64 n64 )	{ SetInt64( n64 ); }
 	explicit CNumStr( uint64 un64 )	{ SetUint64( un64 ); }
 
-	explicit CNumStr( long l )			{ if ( sizeof( l ) == 4 ) SetInt32( (int32)l ); else SetInt64( (int64)l ); }
-	explicit CNumStr( unsigned long l )	{ if ( sizeof( l ) == 4 ) SetUint32( (uint32)l ); else SetUint64( (uint64)l ); }
-
 	explicit CNumStr( double f )	{ SetDouble( f ); }
 	explicit CNumStr( float f )		{ SetFloat( f ); }
 
@@ -140,7 +137,7 @@ public:
 	char *Access() { return m_szBuf; }
 	const char* String() const { return m_szBuf; }
 	int Length() const { return m_nLength; }
-	
+
 	void AddQuotes()
 	{
 		Assert( m_nLength + 2 <= V_ARRAYSIZE(m_szBuf) );
