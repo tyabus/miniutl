@@ -20,7 +20,7 @@
 #pragma once
 #endif
 
-#if !defined(MY_COMPILER_SUCKS)
+#if !defined(MY_COMPILER_SUCKS) && !defined(NO_STL)
 #include <type_traits>
 #endif
 
@@ -99,7 +99,7 @@ inline uint32 HashItemAsBytes( const T&item )
 template <typename T>
 inline uint32 HashItem( const T &item )
 {
-#if !defined(MY_COMPILER_SUCKS)
+#if !defined(MY_COMPILER_SUCKS) && !defined(NO_STL)
 	// If you hit this assert, you have likely used a class such as CUtlHashMap with a non-trivial "Key" type
 	// that we don't know how to hash by default.
 	//
