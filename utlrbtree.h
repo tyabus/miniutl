@@ -2016,7 +2016,11 @@ bool CUtlRBTree<T, I, L, E>::BDiffRBTrees( const CUtlRBTree<T, I, L, E> &rbTreeB
 	bool bDiffer = false;
 	bool bStopOnFirstDifference = ( !prbTreeAdditions && !prbTreeDeletions );
 
+#if __GNUC__ <= 4
+	const LessFunc_t lessFunc = rbTreeBase.m_LessFunc;
+#else
 	const CUtlRBTree<T, I, L, E>::LessFunc_t lessFunc = rbTreeBase.m_LessFunc;
+#endif
 	Assert( lessFunc );
 
 	// can we do this the easy way?

@@ -236,7 +236,7 @@ public:
 
 		ElemType_t &		Element( IndexType_t i )		{ return *reinterpret_cast<IteratorNode_t*>( &reinterpret_cast<CUtlHashMap*>(this)->m_memNodes.Element( i ) ); }
 		const ElemType_t &	Element( IndexType_t i ) const	{ return *reinterpret_cast<const IteratorNode_t*>( &reinterpret_cast<const CUtlHashMap*>(this)->m_memNodes.Element( i ) ); }
-		IndexType_t IteratorNext( IndexType_t i ) const		{ auto pSelf = reinterpret_cast<const CUtlHashMap*>(this); while ( ++i < pSelf->MaxElement() ) { if ( pSelf->IsValidIndex( i ) ) return i; } return -1; }
+		IndexType_t IteratorNext( IndexType_t i ) const		{ const CUtlHashMap *pSelf = reinterpret_cast<const CUtlHashMap*>(this); while ( ++i < pSelf->MaxElement() ) { if ( pSelf->IsValidIndex( i ) ) return i; } return -1; }
 	};
 
 	friend struct IterateKeyElemProxyAlias;
@@ -268,7 +268,7 @@ inline int CUtlHashMap<K,T,L,H>::InsertUnconstructed( const KeyType_t &key, int 
 	IncrementalRehash();
 
 	// hash the item
-	auto hash = m_HashFunc( key );
+	uint32 hash = m_HashFunc( key );
 
 	// migrate data forward, if necessary
 	int cBucketsToModAgainst = m_vecHashBuckets.Count() >> 1;
@@ -486,7 +486,7 @@ inline void CUtlHashMap<K,T,L,H>::RehashNodesInBucket( int iBucketSrc )
 
 		// work out where the node should go
 		const KeyType_t &key = m_memNodes[iNode].m_key;
-		auto hash = m_HashFunc( key );
+		uint32 hash = m_HashFunc( key );
 		int iBucketDest = basetypes::ModPowerOf2( hash, m_vecHashBuckets.Count() );
 
 		// if the hash bucket has changed, move it
@@ -515,7 +515,7 @@ inline int CUtlHashMap<K,T,L,H>::Find( const KeyType_t &key ) const
 		return InvalidIndex();
 
 	// hash the item
-	auto hash = m_HashFunc( key );
+	uint32 hash = m_HashFunc( key );
 
 	// find the bucket
 	int cBucketsToModAgainst = m_vecHashBuckets.Count();
@@ -671,7 +671,7 @@ inline void CUtlHashMap<K,T,L,H>::RemoveAt( IndexType_t i )
 	}
 
 	// unfortunately, we have to re-hash to find which bucket we're in
-	auto hash = m_HashFunc( m_memNodes[i].m_key );
+	uint32 hash = m_HashFunc( m_memNodes[i].m_key );
 	int cBucketsToModAgainst = m_vecHashBuckets.Count();
 	int iBucket = basetypes::ModPowerOf2( hash, cBucketsToModAgainst );
 	if ( RemoveNodeFromBucket( iBucket, i ) )

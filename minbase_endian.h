@@ -40,7 +40,7 @@ inline T DWordSwapC( T dw )
 	uint32 temp;
 #if defined( __ICC )
 	temp = _byteswap_ulong( *(uint32*)&dw );
-#elif defined( __clang__ ) || defined( __GNUC__ )
+#elif defined( __clang__ ) || __GNUC__ >= 4
 	temp = __builtin_bswap32( *(uint32*)&dw );
 #else
 	temp =    *((uint32 *)&dw) >> 24;
@@ -58,7 +58,7 @@ inline T QWordSwapC( T dw )
 	uint64 temp;
 #if defined( __ICC )
 	temp = _byteswap_uint64( *(uint64*)&dw );
-#elif defined( __clang__ ) || defined( __GNUC__ )
+#elif defined( __clang__ ) || __GNUC__ >= 4
 	temp = __builtin_bswap64( *(uint64*)&dw );
 #else
 	temp = (uint64)DWordSwapC( (uint32)( ( *(uint64*)&dw ) >> 32 ) );
