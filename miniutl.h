@@ -24,7 +24,11 @@
 		#else
 			#define FMTFUNCTION( fmtargnumber, firstvarargnumber ) __attribute__ (( format( __printf__, fmtargnumber, firstvarargnumber )))
 		#endif
-		#define FORCEINLINE          inline __attribute__ ((always_inline))
+		#if __GNUC__ >= 4
+			#define FORCEINLINE          inline __attribute__ ((always_inline))
+		#else
+			#define FORCEINLINE inline
+		#endif
 	#else
 		#define FORCEINLINE          inline
 		#define PRINTF_FORMAT_STRING
