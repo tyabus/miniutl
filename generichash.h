@@ -20,10 +20,6 @@
 #pragma once
 #endif
 
-#if !defined(MY_COMPILER_SUCKS) && !defined(NO_STL)
-#include <type_traits>
-#endif
-
 #include "miniutl.h"
 
 uint32 MurmurHash3_32( const void *key, size_t len, uint32 seed, bool bCaselessStringVariant = false );
@@ -99,17 +95,6 @@ inline uint32 HashItemAsBytes( const T&item )
 template <typename T>
 inline uint32 HashItem( const T &item )
 {
-#if !defined(MY_COMPILER_SUCKS) && !defined(NO_STL)
-	// If you hit this assert, you have likely used a class such as CUtlHashMap with a non-trivial "Key" type
-	// that we don't know how to hash by default.
-	//
-	// If it is a simple structure and you are SURE there is no inter-member padding, then you should use
-	// HashFunctorUnPaddedStructure< YourKeyType > in your decl of CUtlHashMap as the 4th template param.
-	//
-	// If there is padding, or if you need to include things pointed to or whatever, then you must define
-	// your own HashFunctor<> explicit instantiation that does all the stuff you want to hash the object.
-	COMPILE_TIME_ASSERT( std::is_integral<T>::value || std::is_enum<T>::value || std::is_pointer<T>::value );
-#endif
 	return HashItemAsBytes( item );
 }
 
