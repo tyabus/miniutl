@@ -32,6 +32,7 @@
 	#else
 		#define FORCEINLINE          inline
 		#define PRINTF_FORMAT_STRING
+		#define FMTFUNCTION( x, y )
 	#endif
 	#define _vsnprintf vsnprintf
 	#define __cdecl

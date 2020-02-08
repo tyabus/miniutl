@@ -112,7 +112,7 @@ static size_t RemoveWhitespace( char *pszString )
 size_t CUtlString::FormatV( const char *pFormat, va_list args )
 {
 	size_t len = 0;
-#ifdef _WIN32
+#if defined _WIN32 || defined __WATCOMC__
 	char buf[4096];
 
 	len = _vsnprintf( buf, sizeof( buf ), pFormat, args );
@@ -165,7 +165,7 @@ size_t CUtlString::FormatV( const char *pFormat, va_list args )
 size_t CUtlString::VAppendFormat( const char *pFormat, va_list args )
 {
 	size_t len = 0;
-#ifdef _WIN32
+#if defined _WIN32 || defined __WATCOMC__
 	char pstrFormatted[4096];
 
 	// format into that space, which is certainly enough
@@ -196,7 +196,7 @@ size_t CUtlString::VAppendFormat( const char *pFormat, va_list args )
 	if ( pstrFormatted != NULL )
 	{
 		Append( pstrFormatted, len );
-#if defined( _WIN32 )
+#if defined( _WIN32 ) || defined __WATCOMC__
 		// no need to free a buffer on stack
 #elif defined( _PS3 )
 		FreePv( pstrFormatted );
