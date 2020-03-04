@@ -6,16 +6,7 @@
 #include <unistd.h>
 #endif
 
-
 #include "miniutl.h"
-
-#if defined( _WIN32 ) || defined( WIN32 )
-#define PATHSEPARATOR(c) ((c) == '\\' || (c) == '/')
-#else	//_WIN32
-#define PATHSEPARATOR(c) ('/' == (c))
-#endif	//_WIN32
-
-
 
 static char* AllocString( const char *pStr, int nMaxChars )
 {

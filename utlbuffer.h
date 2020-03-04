@@ -330,7 +330,7 @@ public:
 	void EnableTabs( bool bEnable );
 
 	// Securely erases buffer
-	void SecureZero() { SecureZeroMemory( m_Memory.Base(), m_Memory.Count() ); }
+	void SecureZero();
 
 protected:
 	// error flags

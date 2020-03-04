@@ -135,7 +135,7 @@ public:
 	// trim whitespace from the end of the string
 	size_t TrimTrailingWhitespace();
 
-	void SecureZero() { SecureZeroMemory( m_pchString, Length() ); }
+	void SecureZero();
 
 #ifdef DBGFLAG_VALIDATE
 	void Validate( CValidator &validator, const char *pchName ) const;	// validate our internal structures
@@ -409,7 +409,7 @@ inline void CUtlString::Wipe()
 	//
 	if ( m_pchString )
 	{
-		SecureZeroMemory( m_pchString, V_strlen( m_pchString ) );
+		SecureZero();
 	}
 	SetValue( NULL );
 }

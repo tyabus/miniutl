@@ -11,10 +11,12 @@
 
 #include <ctype.h>
 #include <string.h>
+
 #ifdef __MINGW32__
-// for __MINGW_PRINTF_FORMAT
-#include <stdio.h>
+	// for __MINGW_PRINTF_FORMAT
+	#include <stdio.h>
 #endif
+
 #include <stdlib.h>
 #include <limits.h>
 #include <stdarg.h>
@@ -22,12 +24,6 @@
 
 template< class T > class CUtlMemory;
 template< class T, class A > class CUtlVector;
-
-#ifdef _WIN64
-#define str_size unsigned int
-#else
-#define str_size size_t
-#endif
 
 #define V_strlen (int)strlen
 #define V_strcmp strcmp

@@ -17,7 +17,7 @@
 #include <limits.h>
 #include "utlbuffer.h"
 #include "fmtstr.h"
-			    
+#include "winlite.h"
 
 //-----------------------------------------------------------------------------
 // Character conversions for C strings
@@ -1897,4 +1897,10 @@ double CUtlBuffer::GetDouble()
 	GET_TYPE( double, d, "%f" );
 #endif
 	return d;
+}
+
+// Securely erases buffer
+void CUtlBuffer::SecureZero()
+{
+	PlatformSecureZeroMemory( m_Memory.Base(), m_Memory.Count() );
 }

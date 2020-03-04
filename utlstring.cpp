@@ -12,6 +12,7 @@
 
 #include "utlstring.h"
 #include "utlvector.h"
+#include "winlite.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: Helper: Find s substring
@@ -542,4 +543,9 @@ bool CUtlString::TruncateUTF8Internal( size_t unMaxChars, size_t unMaxBytes )
 	m_pchString[unBytes] = '\0';
 
 	return bSuccess;
+}
+
+void CUtlString::SecureZero()
+{
+	PlatformSecureZeroMemory( m_pchString, V_strlen( m_pchString ));
 }
