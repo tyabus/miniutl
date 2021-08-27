@@ -999,12 +999,12 @@ inline void CUtlVector<T, A>::Compact()
 
 // easy string list class with dynamically allocated strings. For use with V_SplitString, etc.
 // Frees the dynamic strings in destructor.
-class CUtlStringList : public CUtlVector< char*, CUtlMemory< char*, int > >
+class CUtlStringList : public CUtlVector< char* >
 {
 public:
 	~CUtlStringList( void )
 	{
-		this->PurgeAndDeleteElementsArray();
+		PurgeAndDeleteElementsArray();
 	}
 
 	void CopyAndAddToTail( char const *pString )			// clone the string and add to the end
