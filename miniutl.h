@@ -29,6 +29,7 @@
 		#else
 			#define FORCEINLINE inline
 		#endif
+		#define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 	#else
 		#define FORCEINLINE          inline
 		#define PRINTF_FORMAT_STRING
